@@ -35,7 +35,7 @@ PRECIOUS_TARGETS+=$(LINT_REPORT)
 
 LINT_IGNORE_PATTERNS:=--ignore-pattern '$(DIST)/**/*'
 
-$(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST)
+$(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(LINT_REPORT)
 	git rev-parse HEAD >> $(LINT_REPORT)
