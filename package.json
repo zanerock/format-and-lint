@@ -2,7 +2,9 @@
   "name": "@liquid-labs/catalyst-resource-eslint",
   "version": "1.0.0-alpha.0",
   "description": "",
-  "files": [ "dist/" ],
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "make",
     "lint": "make lint",
@@ -22,7 +24,7 @@
   "homepage": "https://github.com/liquid-labs/catalyst-resource-eslint#readme",
   "dependencies": {
     "@babel/eslint-parser": "^7.22.15",
-    "@liquid-labs/catalyst-resource-babel-and-rollup": "file:.yalc/@liquid-labs/catalyst-resource-babel-and-rollup",
+    "@liquid-labs/catalyst-resource-babel-and-rollup": "^1.0.0-alpha.1",
     "eslint": "^8.50.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.28.1",
