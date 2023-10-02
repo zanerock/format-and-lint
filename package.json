@@ -2,9 +2,15 @@
   "name": "@liquid-labs/catalyst-resource-eslint",
   "version": "1.0.0-alpha.0",
   "description": "",
-  "main": "dist/catalyst-resource-eslint.js",
+  "files": [ "dist/" ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "make",
+    "lint": "make lint",
+    "lint:fix": "make lint-fix",
+    "test": "make test",
+    "prepack": "make build",
+    "preversion": "make test && make lint",
+    "qa": "make qa"
   },
   "keywords": [],
   "author": "Zane Rockenbaugh <zane@liquid-labs.com>",
@@ -13,5 +19,14 @@
   "bugs": {
     "url": "https://github.com/liquid-labs/catalyst-resource-eslint/issues"
   },
-  "homepage": "https://github.com/liquid-labs/catalyst-resource-eslint#readme"
+  "homepage": "https://github.com/liquid-labs/catalyst-resource-eslint#readme",
+  "dependencies": {
+    "@babel/eslint-parser": "^7.22.15",
+    "@liquid-labs/catalyst-resource-babel-and-rollup": "file:.yalc/@liquid-labs/catalyst-resource-babel-and-rollup",
+    "eslint": "^8.50.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1"
+  }
 }
