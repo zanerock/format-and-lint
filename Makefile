@@ -31,7 +31,7 @@ $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 
 LINT_REPORT:=$(QA)/lint.txt
 LINT_PASS_MARKER:=$(QA)/.lint.passed
-PRECIOUS_TARGETS+=$(CATALYST_LINT_REPORT)
+PRECIOUS_TARGETS+=$(LINT_REPORT)
 
 LINT_IGNORE_PATTERNS:=--ignore-pattern '$(DIST)/**/*'
 
