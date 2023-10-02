@@ -64,6 +64,6 @@ all: build
 
 default: all
 
-.PHONY: all build default
+.PHONY: all build default lint qa
 
 .PRECIOUS: $(LINT_REPORT)
