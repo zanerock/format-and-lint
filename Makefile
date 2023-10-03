@@ -70,7 +70,7 @@ test: $(TEST_REPORT) $(TEST_PASS_MARKER)
 
 lint: $(LINT_REPORT) $(LINT_PASS_MARKER)
 
-qa: tost lint
+qa: test lint
 
 build: $(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST)
 
