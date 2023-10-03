@@ -6,10 +6,6 @@ SRC:=src
 DIST:=dist
 QA:=qa
 
-ESLINT:=npx eslint
-
-ESLINT_CONFIG:=$(DIST)/eslint.config.js
-
 ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js")
 
 BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.config.cjs
@@ -29,11 +25,27 @@ $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 	mkdir -p $(dir $@)
 	cp $< $@
 
+JEST:=npx jest
+TEST_REPORT:=$(QA)/unit-test.txt
+TEST_PASS_MARKER:=$(QA)/.unit-test-passed
+PRECIOUS_TARGETS+=$(TEST_REPORT)
+
+$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC)
+	mkdir -p $(dir $@)
+	echo -n 'Test git rev: ' > $(TEST_REPORT)
+	git rev-parse HEAD >> $(TEST_REPORT)
+	( set -e; set -o pipefail; \
+		$(JEST) \
+		| tee -a $(TEST_REPORT); \
+		touch $(TEST_PASS_MARKER) )
+
+ESLINT:=npx eslint
 LINT_REPORT:=$(QA)/lint.txt
 LINT_PASS_MARKER:=$(QA)/.lint.passed
 PRECIOUS_TARGETS+=$(LINT_REPORT)
 
-LINT_IGNORE_PATTERNS:=--ignore-pattern '$(DIST)/**/*'
+LINT_IGNORE_PATTERNS:=--ignore-pattern '$(DIST)/**/*' \
+  --ignore-pattern '$(SRC)/test/data/**/*'
 
 $(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC)
 	mkdir -p $(dir $@)
@@ -54,9 +66,11 @@ lint-fix:
 	    $(LINT_IGNORE_PATTERNS) \
 	    --fix . )
 
-qa: lint
+test: $(TEST_REPORT) $(TEST_PASS_MARKER)
 
 lint: $(LINT_REPORT) $(LINT_PASS_MARKER)
+
+qa: tost lint
 
 build: $(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST)
 
