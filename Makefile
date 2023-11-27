@@ -9,7 +9,7 @@ QA:=qa
 ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js")
 
 BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.config.cjs
-BABEL_PKG:=$(shell npm explore @liquid-labs/catalyst-resource-babel-and-rollup -- pwd)
+BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
 # BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
 CONFIG_FILES_SRC:=$(SRC)/eslint.config.js
@@ -27,7 +27,7 @@ $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 
 JEST:=npx jest
 TEST_REPORT:=$(QA)/unit-test.txt
-TEST_PASS_MARKER:=$(QA)/.unit-test-passed
+TEST_PASS_MARKER:=$(QA)/.unit-test.passed
 PRECIOUS_TARGETS+=$(TEST_REPORT)
 
 $(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC)
