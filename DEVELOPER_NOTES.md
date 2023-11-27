@@ -2,7 +2,7 @@
 
 ## Weird dependency
 
-In order to get the test running, we had to add `@babel/plugin-proposal-class-properties` and `@babel/plugin-proposal-optional-chaining` as developer dependencies. Otherwise we would get an error from babel (7.23.0) that it could not load these dependencies. As far as we can tell, the dependency load is coming from within babel ad not based on any config of ours.
+In order to get the test running, we had to add `@babel/plugin-proposal-class-properties` and `@babel/plugin-proposal-optional-chaining` as developer dependencies. Otherwise we would get an error from babel (7.23.0) that it could not load these dependencies. As far as we can tell, the dependency load is coming from within babel and not based on any config of ours.
 
 ```
 "Parsing error: Cannot resolve module '@babel/plugin-proposal-optional-chaining' from paths ['/Users/zane/.liq/playground/liquid-labs/catalyst-resource-eslint/dist/babel'] from /Users/zane/.liq/playground/liquid-labs/catalyst-resource-eslint/node_modules/@babel/core/lib/config/files/plugins.js\n" +
