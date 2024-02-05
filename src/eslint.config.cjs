@@ -1,3 +1,10 @@
+/**
+ * @file ESLint configuration file implementing (almost) [Standard JS style]{@link https://standardjs.com/},
+ * recommended ESLint js rules,jsdoc rules and, when appropriate, recommended node and react rules as well. Our one
+ * exception to the standard style is implementing aligned colons on multiline 'key-spacing'. We think it makes things
+ * more readable. We also add a preference for regex literals where possible.
+ */
+
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
 
@@ -41,8 +48,8 @@ const eslintConfig = [
     rules : {
       ...standardPlugin.rules,
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      "jsdoc/require-file-overview": "error",
-      'key-spacing' : ['error', {
+      'jsdoc/require-file-overview' : 'error',
+      'key-spacing'                 : ['error', {
         singleLine : {
           beforeColon : true,
           afterColon  : true,
@@ -53,7 +60,8 @@ const eslintConfig = [
           afterColon  : true,
           align       : 'colon'
         }
-      }]
+      }],
+      'prefer-regex-literals' : 'error'
     }
   },
   {
@@ -74,7 +82,7 @@ const eslintConfig = [
       // can't use 'react.config.recommended directly because as of writing it's still usin the old eslint.rc style
       ...reactPlugin.configs.recommended.rules
     },
-    plugins  : { react : reactPlugin }
+    plugins : { react : reactPlugin }
   },
   {
     files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
