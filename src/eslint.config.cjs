@@ -22,12 +22,12 @@ const js = require('@eslint/js')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
-const { engines } = packageJSON
+const { engines = { node : true } } = packageJSON
 
 const eslintConfig = [
   js.configs.recommended,
   {
-    files           : ['**/*.js', '*/*.mjs', '**/*.cjs', '**/*.jsx'],
+    files           : ['**/*.{cjs,js,jsx,mjs}'],
     languageOptions : {
       parser        : babelParser,
       parserOptions : {
@@ -50,6 +50,7 @@ const eslintConfig = [
       ...standardPlugin.rules,
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
       'jsdoc/require-file-overview' : 'error',
+      'jsdoc/require-description'   : 'error',
       'key-spacing'                 : ['error', {
         singleLine : {
           beforeColon : true,
@@ -62,6 +63,7 @@ const eslintConfig = [
           align       : 'colon'
         }
       }],
+      'no-console'            : 'error',
       'prefer-regex-literals' : 'error'
     }
   },
