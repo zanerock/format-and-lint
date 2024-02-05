@@ -1,8 +1,9 @@
 /**
  * @file ESLint configuration file implementing (almost) [Standard JS style]{@link https://standardjs.com/},
- * recommended ESLint js rules,jsdoc rules and, when appropriate, recommended node and react rules as well. Our one
- * exception to the standard style is implementing aligned colons on multiline 'key-spacing'. We think it makes things
- * more readable. We also add a preference for regex literals where possible.
+ * recommended ESLint js rules, [jsdoc rules]{@link https://www.npmjs.com/package/eslint-plugin-jsdoc} and, when
+ * appropriate, recommended node and react rules as well. Our one exception to the standard style is implementing
+ * aligned colons on multiline 'key-spacing'. We think it makes things more readable. We also add a preference for
+ * regex literals where possible.
  */
 
 const { readFileSync } = require('node:fs')
@@ -101,7 +102,9 @@ if (engines?.node !== undefined) {
       globals : globalsPkg.node
     },
     rules : {
-      ...nodePlugin.configs.recommended.rules
+      ...nodePlugin.configs.recommended.rules,
+      'node/prefer-promises/dns' : 'error',
+      'node/prefer-promises/fs'  : 'error'
     }
   })
 }
