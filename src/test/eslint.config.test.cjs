@@ -1,13 +1,14 @@
 /* global describe expect test */
-const { ESLint } = require('eslint')
+const { resolve } = require('node:path')
+const { FlatESLint } = require('eslint/use-at-your-own-risk')
 
 const config = require('../../dist/eslint.config')
 
-describe('eslint.config.js', () => {
+describe('eslint.config.cjs', () => {
   test('detects non-literal regex', async() => {
-    const eslint = new ESLint({
-      useEslintrc    : false,
-      overrideConfig : config
+    const eslint = new FlatESLint({
+      overrideConfig: config,
+      overrideConfigFile : resolve(__dirname, '..', '..', 'dist', 'eslint.config.cjs')
     })
 
     const results = await eslint.lintFiles('src/test/data/non-literal-regex/**/*')

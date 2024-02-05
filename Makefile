@@ -12,7 +12,7 @@ BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.con
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
 # BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
-CONFIG_FILES_SRC:=$(SRC)/eslint.config.js
+CONFIG_FILES_SRC:=$(SRC)/eslint.config.cjs
 CONFIG_FILES_DIST:=$(patsubst $(SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
 
 default: all
@@ -25,17 +25,18 @@ $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 	mkdir -p $(dir $@)
 	cp $< $@
 
-JEST:=npx jest
+JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' npx jest
 TEST_REPORT:=$(QA)/unit-test.txt
 TEST_PASS_MARKER:=$(QA)/.unit-test.passed
 PRECIOUS_TARGETS+=$(TEST_REPORT)
 
-$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC)
+$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(TEST_REPORT)
 	git rev-parse HEAD >> $(TEST_REPORT)
 	( set -e; set -o pipefail; \
 		$(JEST) \
+		--testRegex '(/__tests__/.*|(\.|/)(test|spec))\.c?[jt]sx?$\' \
 		| tee -a $(TEST_REPORT); \
 		touch $(TEST_PASS_MARKER) )
 
@@ -47,22 +48,22 @@ PRECIOUS_TARGETS+=$(LINT_REPORT)
 LINT_IGNORE_PATTERNS:=--ignore-pattern '$(DIST)/**/*' \
   --ignore-pattern '$(SRC)/test/data/**/*'
 
-$(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC)
+$(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(LINT_REPORT)
 	git rev-parse HEAD >> $(LINT_REPORT)
 	( set -e; set -o pipefail; \
-	  $(ESLINT) \
-	    --ext .cjs,.js,.mjs,.cjs,.xjs \
+	  ESLINT_USE_FLAT_CONFIG=true $(ESLINT) \
+	    --config $(CONFIG_FILES_DIST) \
 	    $(LINT_IGNORE_PATTERNS) \
 	    . \
 	    | tee -a $(LINT_REPORT); \
 	  touch $(LINT_PASS_MARKER) )
 
-lint-fix:
+lint-fix: $(CONFIG_FILES_DIST)
 	@( set -e; set -o pipefail; \
-	  $(ESLINT) \
-	    --ext .js,.mjs,.cjs,.xjs \
+	  ESLINT_USE_FLAT_CONFIG = true $(ESLINT) \
+	    --config $(CONFIG_FILES_DIST) \
 	    $(LINT_IGNORE_PATTERNS) \
 	    --fix . )
 

@@ -1,5 +1,5 @@
 const msg = 'Hi!'
 
-const bootstrap = () => msg.replace(new RegExp('.*'), 'refex preferred')
+const bootstrap = () => msg.replace(new RegExp('.*'), 'regex preferred')
 
 export { bootstrap }
