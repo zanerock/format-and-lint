@@ -62,7 +62,7 @@ $(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
 
 lint-fix: $(CONFIG_FILES_DIST)
 	@( set -e; set -o pipefail; \
-	  ESLINT_USE_FLAT_CONFIG = true $(ESLINT) \
+	  ESLINT_USE_FLAT_CONFIG=true $(ESLINT) \
 	    --config $(CONFIG_FILES_DIST) \
 	    $(LINT_IGNORE_PATTERNS) \
 	    --fix . )
