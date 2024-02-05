@@ -6,8 +6,7 @@
  * [react]{@link https://www.npmjs.com/package/eslint-plugin-react} rules as well.
  *
  * Our one exception to the standard style is implementing aligned colons on multiline
- * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible
- * and 'no-console' (use <code>process.stdout</code>)
+ * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
 
 const { readFileSync } = require('node:fs')
@@ -28,7 +27,10 @@ const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
 const { engines = { node : true } } = packageJSON
 
+const commonIgnores = ['dist/**', 'test-staging/**', 'doc/**', '.yalc/**']
+
 const eslintConfig = [
+  { ignores: commonIgnores },
   {
     files           : ['**/*.{cjs,js,jsx,mjs}'],
     languageOptions : {
@@ -38,13 +40,15 @@ const eslintConfig = [
         requireConfigFile : true,
         babelOptions      : {
           configFile : join(__dirname, 'babel', 'babel.config.cjs')
+        },
+        ecmaFeatures : {
+          jsx : true
         }
       },
       ecmaVersion : 'latest'
     },
     plugins : {
       standard : standardPlugin,
-      jsdoc    : jsdocPlugin,
       import   : importPlugin,
       promise  : promisePlugin,
       n        : nPlugin
@@ -52,9 +56,9 @@ const eslintConfig = [
     rules : {
       ...js.configs.recommended.rules,
       ...standardPlugin.rules,
-      ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      'jsdoc/require-file-overview' : 'error',
-      'jsdoc/require-description'   : 'error',
+      // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
+      'import/export': 'off',
+      // this is our one modification to JS Standard style
       'key-spacing'                 : ['error', {
         singleLine : {
           beforeColon : true,
@@ -67,8 +71,17 @@ const eslintConfig = [
           align       : 'colon'
         }
       }],
-      'no-console'            : 'error',
       'prefer-regex-literals' : 'error'
+    }
+  },
+  {
+    files           : ['**/*.{cjs,js,jsx,mjs}'],
+    ignores: ["**/index.{js,cjs,mjs}", "**/__tests__/**/*", "**/*.test.*"],
+    plugins: { jsdoc: jsdocPlugin },
+    rules: {
+      ...jsdocPlugin.configs['flat/recommended-error'].rules,
+      'jsdoc/require-file-overview' : ['error', ],
+      'jsdoc/require-description'   : 'error'
     }
   },
   {
@@ -98,6 +111,15 @@ const eslintConfig = [
         ...globalsPkg.jest
       }
     }
+  },
+  {
+    files           : ['**/*.jsx'],
+    languageOptions : {
+      globals : {
+        'Event'  : true,
+        'window' : true
+      }
+    }
   }
 ]
 
@@ -109,6 +131,7 @@ if (engines?.node !== undefined) {
     },
     rules : {
       ...nodePlugin.configs.recommended.rules,
+      'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
       'node/prefer-promises/dns' : 'error',
       'node/prefer-promises/fs'  : 'error'
     }
