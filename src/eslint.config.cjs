@@ -1,9 +1,13 @@
 /**
  * @file ESLint configuration file implementing (almost) [Standard JS style]{@link https://standardjs.com/},
- * recommended ESLint js rules, [jsdoc rules]{@link https://www.npmjs.com/package/eslint-plugin-jsdoc} and, when
- * appropriate, recommended node and react rules as well. Our one exception to the standard style is implementing
- * aligned colons on multiline 'key-spacing'. We think it makes things more readable. We also add a preference for
- * regex literals where possible.
+ * [ESLint recommended js rules]{@link https://eslint.org/docs/latest/rules/}, 
+ * [jsdoc rules]{@link https://www.npmjs.com/package/eslint-plugin-jsdoc} and, when appropriate, 
+ * [recommended node]{@link https://www.npmjs.com/package/eslint-plugin-node} and 
+ * [react]{@link https://www.npmjs.com/package/eslint-plugin-react} rules as well.
+ * 
+ * Our one exception to the standard style is implementing aligned colons on multiline 
+ * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible 
+ * and 'no-console' (use <code>process.stdout</code>)
  */
 
 const { readFileSync } = require('node:fs')
@@ -25,7 +29,6 @@ const packageJSON = JSON.parse(packageContents)
 const { engines = { node : true } } = packageJSON
 
 const eslintConfig = [
-  js.configs.recommended,
   {
     files           : ['**/*.{cjs,js,jsx,mjs}'],
     languageOptions : {
@@ -47,6 +50,7 @@ const eslintConfig = [
       n        : nPlugin
     },
     rules : {
+      ...js.configs.recommended.rules,
       ...standardPlugin.rules,
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
       'jsdoc/require-file-overview' : 'error',
