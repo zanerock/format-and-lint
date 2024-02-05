@@ -30,7 +30,7 @@ const { engines = { node : true } } = packageJSON
 const commonIgnores = ['dist/**', 'test-staging/**', 'doc/**', '.yalc/**']
 
 const eslintConfig = [
-  { ignores: commonIgnores },
+  { ignores : commonIgnores },
   {
     files           : ['**/*.{cjs,js,jsx,mjs}'],
     languageOptions : {
@@ -57,9 +57,9 @@ const eslintConfig = [
       ...js.configs.recommended.rules,
       ...standardPlugin.rules,
       // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
-      'import/export': 'off',
+      'import/export' : 'off',
       // this is our one modification to JS Standard style
-      'key-spacing'                 : ['error', {
+      'key-spacing'   : ['error', {
         singleLine : {
           beforeColon : true,
           afterColon  : true,
@@ -75,12 +75,12 @@ const eslintConfig = [
     }
   },
   {
-    files           : ['**/*.{cjs,js,jsx,mjs}'],
-    ignores: ["**/index.{js,cjs,mjs}", "**/__tests__/**/*", "**/*.test.*"],
-    plugins: { jsdoc: jsdocPlugin },
-    rules: {
+    files   : ['**/*.{cjs,js,jsx,mjs}'],
+    ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
+    plugins : { jsdoc : jsdocPlugin },
+    rules   : {
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      'jsdoc/require-file-overview' : ['error', ],
+      'jsdoc/require-file-overview' : ['error'],
       'jsdoc/require-description'   : 'error'
     }
   },
@@ -116,8 +116,8 @@ const eslintConfig = [
     files           : ['**/*.jsx'],
     languageOptions : {
       globals : {
-        'Event'  : true,
-        'window' : true
+        Event  : true,
+        window : true
       }
     }
   }
@@ -132,8 +132,8 @@ if (engines?.node !== undefined) {
     rules : {
       ...nodePlugin.configs.recommended.rules,
       'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
-      'node/prefer-promises/dns' : 'error',
-      'node/prefer-promises/fs'  : 'error'
+      'node/prefer-promises/dns'               : 'error',
+      'node/prefer-promises/fs'                : 'error'
     }
   })
 }
