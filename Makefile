@@ -6,7 +6,7 @@ SRC:=src
 DIST:=dist
 QA:=qa
 
-ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js")
+ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js" -o -name "*.cjs")
 
 BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.config.cjs
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
@@ -45,9 +45,6 @@ LINT_REPORT:=$(QA)/lint.txt
 LINT_PASS_MARKER:=$(QA)/.lint.passed
 PRECIOUS_TARGETS+=$(LINT_REPORT)
 
-LINT_IGNORE_PATTERNS:=--ignore-pattern '$(DIST)/**/*' \
-  --ignore-pattern '$(SRC)/test/data/**/*'
-
 $(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(LINT_REPORT)
@@ -55,7 +52,6 @@ $(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
 	( set -e; set -o pipefail; \
 	  ESLINT_USE_FLAT_CONFIG=true $(ESLINT) \
 	    --config $(CONFIG_FILES_DIST) \
-	    $(LINT_IGNORE_PATTERNS) \
 	    . \
 	    | tee -a $(LINT_REPORT); \
 	  touch $(LINT_PASS_MARKER) )

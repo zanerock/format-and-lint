@@ -8,7 +8,6 @@
  * Our one exception to the standard style is implementing aligned colons on multiline
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
-
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
 
@@ -25,9 +24,43 @@ const js = require('@eslint/js')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
-const { engines = { node : true } } = packageJSON
+const { _sdlc, engines = { node : true } } = packageJSON
 
-const commonIgnores = ['dist/**', 'test-staging/**', 'doc/**', '.yalc/**']
+let gitignoreContents
+try {
+  gitignoreContents = readFileSync('./.gitignore', { encoding : 'utf8' })
+} catch (e) {
+  if (e.code !== 'ENOENT') { throw e }
+  // else, it's fine there is just no .gitignore
+}
+
+// first we set up the files to ignore by reading out '.gitignore'
+const commonIgnores = ['doc/**']
+if (gitignoreContents !== undefined && process.env.SDLC_LINT_SKIP_GITIGNORE !== 'true') {
+  const gitignoreLines = gitignoreContents.split(/\r?\n/)
+  for (const gitIgnore of gitignoreLines) {
+    if (gitIgnore.trim() === '') continue
+
+    let newIgnore
+    if (gitIgnore.startsWith('/')) {
+      newIgnore = gitIgnore.slice(1)
+    } else {
+      newIgnore = '**/' + gitIgnore
+    }
+    if (!newIgnore.endsWith('/')) {
+      newIgnore += '/'
+    }
+    newIgnore += '**'
+
+    commonIgnores.push(newIgnore)
+  }
+}
+
+// we also include any ignores from the package.json
+if (_sdlc !== null && _sdlc.linting !== undefined && process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES !== 'true') {
+  const { ignores } = _sdlc.linting
+  commonIgnores.push(...ignores)
+}
 
 const eslintConfig = [
   { ignores : commonIgnores },
