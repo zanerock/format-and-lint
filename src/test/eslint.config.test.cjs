@@ -4,13 +4,18 @@
 const { resolve } = require('node:path')
 const { FlatESLint } = require('eslint/use-at-your-own-risk') /* eslint-disable-line node/no-missing-require */
 
-// erroneously comaplains that '.config' is the extension
-const config = require('../../dist/eslint.config') /* eslint-disable-line import/extensions,node/no-missing-require */
-
 describe('eslint.config.cjs', () => {
+  beforeAll(() => {
+    process.env.SDLC_LINT_SKIP_GITIGNORE = 'true'
+    process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES = 'true'
+  })
+  afterAll(() => {
+    delete process.env.SDLC_LINT_SKIP_GITIGNORE
+    delete process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES
+  })
+
   test('detects non-literal regex', async () => {
     const eslint = new FlatESLint({ // TODO: just use Linter and embed the code here rather than require separate files
-      overrideConfig     : config,
       overrideConfigFile : resolve(__dirname, '..', '..', 'dist', 'eslint.config.cjs')
     })
 
