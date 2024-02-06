@@ -24,7 +24,7 @@ const js = require('@eslint/js')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
-const { _sdlc, engines = { node : true } } = packageJSON
+const { _sdlc, dependencies = {}, devDependencies = {}, engines = { node : true } } = packageJSON
 
 let gitignoreContents
 try {
@@ -33,6 +33,11 @@ try {
   if (e.code !== 'ENOENT') { throw e }
   // else, it's fine there is just no .gitignore
 }
+
+const usesReact = dependencies.react !== undefined || devDependencies.react !== undefined
+const reactSettings = usesReact
+  ? { version : 'detect' }
+  : {}
 
 // first we set up the files to ignore by reading out '.gitignore'
 const commonIgnores = ['doc/**']
@@ -62,8 +67,49 @@ if (_sdlc !== null && _sdlc.linting !== undefined && process.env.SDLC_LINT_SKIP_
   commonIgnores.push(...ignores)
 }
 
+const plugins = {
+  // the 'standard' rules plugins
+  standard : standardPlugin,
+  import   : importPlugin,
+  promise  : promisePlugin,
+  n        : nPlugin
+}
+
+const rules = {
+  ...js.configs.recommended.rules,
+  ...standardPlugin.rules,
+  // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
+  'import/export'  : 'off',
+  // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
+  // which we need to import for react to work, even when not used
+  'no-unused-vars' : ['error', { varsIgnorePattern : 'React' }],
+  // this is our one modification to JS Standard style
+  'key-spacing'    : ['error', {
+    singleLine : {
+      beforeColon : true,
+      afterColon  : true,
+      mode        : 'strict'
+    },
+    multiLine : {
+      beforeColon : true,
+      afterColon  : true,
+      align       : 'colon'
+    }
+  }],
+  'prefer-regex-literals' : 'error'
+}
+
+if (usesReact === true) {
+  plugins.react = reactPlugin
+  Object.assign(rules, reactPlugin.configs.recommended.rules)
+}
+
 const eslintConfig = [
+  // setting 'ignores' like this excludes the matching files from any processing; setting 'ignores' with 'files' in the
+  // same object only excludes the ignored files from those rules but not from being processed alltogether
   { ignores : commonIgnores },
+  // general standard rules; the react rules have to go here to or else ESLint thinks components aren't used and
+  // triggers the 'no-unused-vars' rule
   {
     files           : ['**/*.{cjs,js,jsx,mjs}'],
     languageOptions : {
@@ -80,33 +126,13 @@ const eslintConfig = [
       },
       ecmaVersion : 'latest'
     },
-    plugins : {
-      standard : standardPlugin,
-      import   : importPlugin,
-      promise  : promisePlugin,
-      n        : nPlugin
+    settings : {
+      react : reactSettings
     },
-    rules : {
-      ...js.configs.recommended.rules,
-      ...standardPlugin.rules,
-      // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
-      'import/export' : 'off',
-      // this is our one modification to JS Standard style
-      'key-spacing'   : ['error', {
-        singleLine : {
-          beforeColon : true,
-          afterColon  : true,
-          mode        : 'strict'
-        },
-        multiLine : {
-          beforeColon : true,
-          afterColon  : true,
-          align       : 'colon'
-        }
-      }],
-      'prefer-regex-literals' : 'error'
-    }
+    plugins,
+    rules
   },
+  // jsdoc rules
   {
     files   : ['**/*.{cjs,js,jsx,mjs}'],
     ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
@@ -117,40 +143,21 @@ const eslintConfig = [
       'jsdoc/require-description'   : 'error'
     }
   },
+  // add necessary globals and react settinsg when processing JSX files
   {
     files           : ['**/*.jsx'],
     languageOptions : {
-      parserOptions : {
-        ecmaFeatures : {
-          jsx : true
-        }
+      globals : {
+        ...globalsPkg.browser
       }
-    },
-    settings : {
-      react : {
-        version : 'detect'
-      }
-    },
-    rules : {
-      // can't use 'react.config.recommended directly because as of writing it's still usin the old eslint.rc style
-      ...reactPlugin.configs.recommended.rules
-    },
-    plugins : { react : reactPlugin }
+    }
   },
+  // adds correct globals when processing jest tests
   {
     files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
     languageOptions : {
       globals : {
         ...globalsPkg.jest
-      }
-    }
-  },
-  {
-    files           : ['**/*.jsx'],
-    languageOptions : {
-      globals : {
-        Event  : true,
-        window : true
       }
     }
   }
