@@ -139,8 +139,7 @@ const eslintConfig = [
     plugins : { jsdoc : jsdocPlugin },
     rules   : {
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      'jsdoc/require-file-overview' : ['error'],
-      'jsdoc/require-description'   : 'error'
+      'jsdoc/require-description' : 'error'
     }
   },
   // add necessary globals and react settinsg when processing JSX files
