@@ -62,7 +62,7 @@ if (gitignoreContents !== undefined && process.env.SDLC_LINT_SKIP_GITIGNORE !== 
 }
 
 // we also include any ignores from the package.json
-if (_sdlc !== null && _sdlc.linting !== undefined && process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES !== 'true') {
+if (_sdlc !== undefined && _sdlc.linting !== undefined && process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES !== 'true') {
   const { ignores } = _sdlc.linting
   commonIgnores.push(...ignores)
 }
