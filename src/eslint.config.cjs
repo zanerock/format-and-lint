@@ -172,7 +172,10 @@ if (engines?.node !== undefined) {
       ...nodePlugin.configs.recommended.rules,
       'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
       'node/prefer-promises/dns'               : 'error',
-      'node/prefer-promises/fs'                : 'error'
+      'node/prefer-promises/fs'                : 'error',
+      'node/no-missing-import'                 : ['error', {
+        tryExtensions : ['.js', '.cjs', '.mjs', '.jsx']
+      }]
     }
   })
 }
