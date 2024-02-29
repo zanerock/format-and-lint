@@ -146,27 +146,25 @@ const eslintConfig = [
   {
     files           : ['**/*.jsx'],
     languageOptions : {
-      globals : {
-        ...globalsPkg.browser
-      }
+      globals : globalsPkg.browser
     }
   },
   // adds correct globals when processing jest tests
   {
     files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
     languageOptions : {
-      globals : {
-        ...globalsPkg.jest
-      }
+      globals : globalsPkg.jest
     }
   }
 ]
 
 if (engines?.node !== undefined) {
   eslintConfig.push({
+    files           : ['**/*.{cjs,js,jsx,mjs}'],
     plugins         : { node : nodePlugin },
     languageOptions : {
-      globals : globalsPkg.node
+      // globals used to define structuredClone (I'm pretty sure), but now doesn't for some reason...
+      globals : { structuredClone : false, ...globalsPkg.node }
     },
     rules : {
       ...nodePlugin.configs.recommended.rules,
