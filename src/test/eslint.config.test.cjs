@@ -16,7 +16,7 @@ describe('eslint.config.cjs', () => {
 
   test('detects non-literal regex', async () => {
     const eslint = new FlatESLint({ // TODO: just use Linter and embed the code here rather than require separate files
-      overrideConfigFile : resolve(__dirname, '..', '..', 'dist', 'eslint.config.cjs')
+      overrideConfigFile : resolve(__dirname, '..', '..', 'dist', 'eslint.config.cjs'),
     })
 
     const results = await eslint.lintFiles('src/test/data/non-literal-regex/**/*')
