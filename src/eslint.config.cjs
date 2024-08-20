@@ -12,6 +12,7 @@ const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
 
 const babelParser = require('@babel/eslint-parser')
+const stylistic = require('@stylistic/eslint-plugin')
 const globalsPkg = require('globals')
 const importPlugin = require('eslint-plugin-import')
 const jsdocPlugin = require('eslint-plugin-jsdoc')
@@ -19,8 +20,6 @@ const nodePlugin = require('eslint-plugin-node')
 const promisePlugin = require('eslint-plugin-promise')
 const nPlugin = require('eslint-plugin-n')
 const standardPlugin = require('eslint-config-standard')
-const reactPlugin = require('eslint-plugin-react')
-const js = require('@eslint/js')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
@@ -67,17 +66,52 @@ if (_sdlc !== undefined && _sdlc.linting !== undefined && process.env.SDLC_LINT_
   commonIgnores.push(...ignores)
 }
 
-const plugins = {
-  // the 'standard' rules plugins
-  standard : standardPlugin,
-  import   : importPlugin,
-  promise  : promisePlugin,
-  n        : nPlugin
-}
+const stylisticConfig = stylistic.configs['recommended-flat']
+
+const plugins = Object.assign({
+    // the 'standard' rules plugins
+    standard : standardPlugin,
+    import   : importPlugin,
+    promise  : promisePlugin,
+    n        : nPlugin
+  },
+  stylisticConfig.plugins // this names the plugin '@stylistic'
+)
 
 const rules = {
-  ...js.configs.recommended.rules,
   ...standardPlugin.rules,
+  ...stylisticConfig.rules,
+  // override key spacing to get things aligned
+  '@stylistic/key-spacing': ['error', { align: 'colon', afterColon: true, beforeColon: true }],
+  // override to allow avoiding escapes
+  '@stylistic/quotes': ['error', 'single', { allowTemplateLiterals: true, avoidEscape: true }],
+  // additional rules
+  '@stylistic/arrow-parens' : ['error', 'always'],
+  '@stylistic/array-bracket-newline': ['error', 'consistent'],
+  '@stylistic/array-element-newline': ['error', 'consistent'],
+  '@stylistic/function-call-argument-newline': ['error', 'consistent'],
+  '@stylistic/function-call-spacing': ['error', 'never'],
+  '@stylistic/function-paren-newline': ['error', 'consistent'],
+  '@stylistic/implicit-arrow-linebreak': ['error', 'beside'],
+  '@stylistic/padding-line-between-statements': ['error', 
+    { blankLine: 'always', prev: '*', next: 'export' },
+    { blankLine: 'always', prev: '*', next: 'cjs-export' },
+    // What I really want is 'next except self'...
+    // { blankLine: 'always', prev: 'import', next: '*' },
+    // { blankLine: 'always', prev: 'cjs-import', next: '*' },
+    { blankLine: 'always', prev: '*', next: 'return' },
+  ],
+  '@stylistic/semi-style': ['error', 'last'],
+  '@stylistic/switch-colon-spacing': ['error', { after: true, before: false }],
+  // one-true-brace-style /is/ the more common, but i just don't like it. I think Stroustrup is easier to read *and*, 
+  // most important, with 1tbs, you can't do these kind of comments:
+  //
+  // if { ...
+  // } // I really like to be able to put comments here
+  // else if (some really conditional that means we'd have to put our comment inside the else-if!) {...}
+  //
+  // and I do those kind of comments sometime.
+  // 'standard/brace-style'    : ['errer', 'stroustrup', { allowSingleLine: true }],
   // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
   'import/export'  : 'off',
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
@@ -99,10 +133,16 @@ const rules = {
   'prefer-regex-literals' : 'error'
 }
 
+// OK, so the standard plugin provides lots of nice rules, but there are some conflicts, so we delete them (and let the 
+// @stylistic rules control).
+delete rules['comma-dangle']
+delete rules['brace-style']
+
+/* // react now covered by stylistic
 if (usesReact === true) {
   plugins.react = reactPlugin
   Object.assign(rules, reactPlugin.configs.recommended.rules)
-}
+}*/
 
 const eslintConfig = [
   // setting 'ignores' like this excludes the matching files from any processing; setting 'ignores' with 'files' in the
@@ -117,18 +157,12 @@ const eslintConfig = [
       parserOptions : {
         sourceType        : 'module',
         requireConfigFile : true,
-        babelOptions      : {
-          configFile : join(__dirname, 'babel', 'babel.config.cjs')
-        },
-        ecmaFeatures : {
-          jsx : true
-        }
+        babelOptions      : { configFile : join(__dirname, 'babel', 'babel.config.cjs') },
+        ecmaFeatures : { jsx : true }
       },
       ecmaVersion : 'latest'
     },
-    settings : {
-      react : reactSettings
-    },
+    settings : { react : reactSettings },
     plugins,
     rules
   },
@@ -139,23 +173,22 @@ const eslintConfig = [
     plugins : { jsdoc : jsdocPlugin },
     rules   : {
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      'jsdoc/require-description' : 'error'
+      'jsdoc/require-description' : 'error',
+      // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
+      // e.g., func(foo = true)), but if this is possible, it's not working for us.
+      'jsdoc/no-defaults'         : 'off'
     }
   },
   // add necessary globals and react settinsg when processing JSX files
   {
     files           : ['**/*.jsx'],
-    languageOptions : {
-      globals : globalsPkg.browser
-    }
+    languageOptions : { globals : globalsPkg.browser }
   },
   // adds correct globals when processing jest tests
   {
     files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
-    languageOptions : {
-      globals : globalsPkg.jest
-    }
-  }
+    languageOptions : { globals : globalsPkg.jest },
+  },
 ]
 
 if (engines?.node !== undefined) {
