@@ -2,7 +2,7 @@
 
 ## Dropping standard rules
 
-When we upgraded to the latest ['@stylistic'](https://eslint.style/) plugin and ruleset, we dropped the 'standard' rules.
+When we upgraded to the latest ['@stylistic'](https://eslint.style/) plugin and ruleset, we had a couple conflict with the 'standard' ruleset. We thought about dropping the standard rules, but there are a lot of good ones, so instead of losing that work, we deleted the conflicting rules. We may find additional conflicts in the future.
 
 ## Weird dependency
 
