@@ -136,8 +136,9 @@ const rules = {
 
 // OK, so the standard plugin provides lots of nice rules, but there are some conflicts, so we delete them (and let the
 // @stylistic rules control).
-delete rules['comma-dangle']
-delete rules['brace-style']
+delete rules['brace-style'] // they want 1tbs, we want stroustrup
+delete rules['comma-dangle'] // they so no, we say multiline
+delete rules['operator-linebreak'] // they say after, we say before
 
 /* // react now covered by stylistic
 if (usesReact === true) {
