@@ -138,7 +138,7 @@ const rules = {
 delete rules['brace-style'] // they want 1tbs, we want stroustrup
 delete rules['comma-dangle'] // they so no, we say multiline
 delete rules['operator-linebreak'] // they say after, we say before
-delete rules[' no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
+delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 
 /* // react now covered by stylistic
 if (usesReact === true) {
