@@ -93,7 +93,6 @@ const rules = {
   '@stylistic/function-call-argument-newline'  : ['error', 'consistent'],
   '@stylistic/function-call-spacing'           : ['error', 'never'],
   '@stylistic/function-paren-newline'          : ['error', 'consistent'],
-  '@stylistic/implicit-arrow-linebreak'        : ['error', 'beside'],
   '@stylistic/max-statements-per-line'         : ['error', { max : 2 }], // allow for short one-liners
   '@stylistic/padding-line-between-statements' : ['error',
     { blankLine : 'always', prev : '*', next : 'export' },
