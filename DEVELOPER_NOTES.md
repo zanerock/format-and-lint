@@ -1,5 +1,9 @@
 # Developer Notes
 
+## Dropping standard rules
+
+When we upgraded to the latest ['@stylistic'](https://eslint.style/) plugin and ruleset, we dropped the 'standard' rules.
+
 ## Weird dependency
 
 In order to get the test running, we had to add `@babel/plugin-proposal-class-properties` and `@babel/plugin-proposal-optional-chaining` as developer dependencies. Otherwise we would get an error from babel (7.23.0) that it could not load these dependencies. As far as we can tell, the dependency load is coming from within babel and not based on any config of ours.
