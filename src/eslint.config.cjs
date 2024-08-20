@@ -179,6 +179,7 @@ const eslintConfig = [
       // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
       // e.g., func(foo = true)), but if this is possible, it's not working for us.
       'jsdoc/no-defaults'         : 'off',
+      'jsdoc/check-tag-names'     : ['error', { definedTags: ['category'] }],
     },
   },
   // add necessary globals and react settinsg when processing JSX files
