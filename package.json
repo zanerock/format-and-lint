@@ -32,7 +32,7 @@
   "dependencies": {
     "@babel/eslint-parser": "^7.22.15",
     "@eslint/js": "^8.56.0",
-    "@liquid-labs/sdlc-resource-babel-and-rollup": "^1.0.0-alpha.6",
+    "@liquid-labs/sdlc-resource-babel-and-rollup": "file:.yalc/@liquid-labs/sdlc-resource-babel-and-rollup",
     "@stylistic/eslint-plugin": "^2.6.4",
     "eslint": "^8.50.0",
     "eslint-config-standard": "^17.1.0",

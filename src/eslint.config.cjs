@@ -101,8 +101,12 @@ const rules = {
     // { blankLine: 'always', prev: 'import', next: '*' },
     // { blankLine: 'always', prev: 'cjs-import', next: '*' },
     { blankLine : 'always', prev : '*', next : 'return' }],
-  '@stylistic/semi-style'           : ['error', 'last'],
-  '@stylistic/switch-colon-spacing' : ['error', { after : true, before : false }],
+  '@stylistic/semi-style'                  : ['error', 'last'],
+  // The @stylistic default of 'always' for all seems at odd with general standards, which don't have space before
+  // named functions. I like that because when we invoke a function, you never see a space, and I see no reason to
+  // write the declaration different.
+  '@stylistic/space-before-function-paren' : ['error', { anonymous : 'always', asyncArrow : 'always', named : 'never' }],
+  '@stylistic/switch-colon-spacing'        : ['error', { after : true, before : false }],
   // one-true-brace-style /is/ the more common, but i just don't like it. I think Stroustrup is easier to read *and*,
   // most important, with 1tbs, you can't do these kind of comments:
   //
@@ -113,12 +117,12 @@ const rules = {
   // and I do those kind of comments sometime.
   // 'standard/brace-style'    : ['errer', 'stroustrup', { allowSingleLine: true }],
   // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
-  'import/export'                   : 'off',
+  'import/export'                          : 'off',
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
   // which we need to import for react to work, even when not used
-  'no-unused-vars'                  : ['error', { varsIgnorePattern : 'React' }],
+  'no-unused-vars'                         : ['error', { varsIgnorePattern : 'React' }],
   // this is our one modification to JS Standard style
-  'key-spacing'                     : ['error', {
+  'key-spacing'                            : ['error', {
     singleLine : {
       beforeColon : true,
       afterColon  : true,
@@ -139,6 +143,7 @@ delete rules['brace-style'] // they want 1tbs, we want stroustrup
 delete rules['comma-dangle'] // they so no, we say multiline
 delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
+delete rules['space-before-function-paren'] // we override default and redundant anyway
 
 /* // react now covered by stylistic
 if (usesReact === true) {
