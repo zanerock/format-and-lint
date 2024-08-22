@@ -9,16 +9,25 @@
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
 const { readFileSync } = require('node:fs')
+
 const { join } = require('node:path')
 
 const babelParser = require('@babel/eslint-parser')
+
 const stylistic = require('@stylistic/eslint-plugin')
+
 const globalsPkg = require('globals')
+
 const importPlugin = require('eslint-plugin-import')
+
 const jsdocPlugin = require('eslint-plugin-jsdoc')
+
 const nodePlugin = require('eslint-plugin-node')
+
 const promisePlugin = require('eslint-plugin-promise')
+
 const nPlugin = require('eslint-plugin-n')
+
 const standardPlugin = require('eslint-config-standard')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
@@ -79,6 +88,55 @@ const plugins = Object.assign({
 },
 stylisticConfig.plugins) // this names the plugin '@stylistic'
 
+const linebreakTypes = [
+  'block',
+  'block-like',
+  'break',
+  'case',
+  'cjs-export',
+  'cjs-import',
+  'class',
+  'const',
+  'continue',
+  'debugger',
+  'default',
+  'directive',
+  'do',
+  'empty',
+  'export',
+  'expression',
+  'for',
+  'function',
+  'if',
+  'iife',
+  'import',
+  'let',
+  'multiline-block-like',
+  'multiline-const',
+  'multiline-expression',
+  'multiline-let',
+  'multiline-var',
+  'return',
+  'singleline-const',
+  'singleline-let',
+  'singleline-var',
+  'switch',
+  'throw',
+  'try',
+  'var',
+  'while',
+  'with',
+]
+
+const linbreakTypesExcept = (...types) => {
+  const result = [...linebreakTypes]
+  for (const type of types) {
+    result.splice(result.indexOf(type), 1)
+  }
+
+  return result
+}
+
 const rules = {
   ...standardPlugin.rules,
   ...stylisticConfig.rules,
@@ -95,11 +153,16 @@ const rules = {
   '@stylistic/function-paren-newline'          : ['error', 'consistent'],
   '@stylistic/max-statements-per-line'         : ['error', { max : 2 }], // allow for short one-liners
   '@stylistic/padding-line-between-statements' : ['error',
-    { blankLine : 'always', prev : '*', next : 'export' },
-    { blankLine : 'always', prev : '*', next : 'cjs-export' },
-    // What I really want is 'next except self'...
-    // { blankLine: 'always', prev: 'import', next: '*' },
-    // { blankLine: 'always', prev: 'cjs-import', next: '*' },
+    { blankLine : 'always', prev : '*', next : 'class' },
+    { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'export' },
+    { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'cjs-export' },
+    { blankLine : 'always', prev : 'import', next : linbreakTypesExcept('import') },
+    // { blankLine : 'always', prev : 'cjs-import', next : linbreakTypesExcept('cjs-import') },
+    {
+      blankLine : 'always',
+      prev      : 'cjs-import',
+      next      : linbreakTypesExcept('cjs-import', 'const', 'let', 'singleline-const', 'singleline-let', 'singleline-var', 'var'),
+    },
     { blankLine : 'always', prev : '*', next : 'return' }],
   '@stylistic/semi-style'                  : ['error', 'last'],
   // The @stylistic default of 'always' for all seems at odd with general standards, which don't have space before
@@ -141,6 +204,7 @@ const rules = {
 // @stylistic rules control).
 delete rules['brace-style'] // they want 1tbs, we want stroustrup
 delete rules['comma-dangle'] // they so no, we say multiline
+delete rules['eol-last'] // redundant with @stylistic
 delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 delete rules['space-before-function-paren'] // we override default and redundant anyway
