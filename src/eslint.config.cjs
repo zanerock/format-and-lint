@@ -79,6 +79,54 @@ const plugins = Object.assign({
 },
 stylisticConfig.plugins) // this names the plugin '@stylistic'
 
+linebreakTypes = [
+  'block',
+  'block-like',
+  'break',
+  'case',
+  'cjs-export',
+  'cjs-import',
+  'class',
+  'const',
+  'continue',
+  'debugger',
+  'default',
+  'directive',
+  'do',
+  'empty',
+  'export',
+  'expression',
+  'for',
+  'function',
+  'if',
+  'iife',
+  'import',
+  'let',
+  'multiline-block-like',
+  'multiline-const',
+  'multiline-expression',
+  'multiline-let',
+  'multiline-var',
+  'return',
+  'singleline-const',
+  'singleline-let',
+  'singleline-var',
+  'switch',
+  'throw',
+  'try',
+  'var',
+  'while',
+  'with',
+]
+
+const linbreakTypesExcept = (...types) => {
+  const result = [...linebreakTypes]
+  for (const type of types) {
+    result.splice(result.indexOf(type), 1)
+  }
+  return result
+}
+
 const rules = {
   ...standardPlugin.rules,
   ...stylisticConfig.rules,
@@ -95,11 +143,10 @@ const rules = {
   '@stylistic/function-paren-newline'          : ['error', 'consistent'],
   '@stylistic/max-statements-per-line'         : ['error', { max : 2 }], // allow for short one-liners
   '@stylistic/padding-line-between-statements' : ['error',
-    { blankLine : 'always', prev : '*', next : 'export' },
-    { blankLine : 'always', prev : '*', next : 'cjs-export' },
-    // What I really want is 'next except self'...
-    // { blankLine: 'always', prev: 'import', next: '*' },
-    // { blankLine: 'always', prev: 'cjs-import', next: '*' },
+    { blankLine: 'always', prev: '*', next: 'class'},
+    { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'export' },
+    { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'cjs-export' },
+    { blankLine: 'always', prev: ['cjs-import', 'import'], next: linbreakTypesExcept('cjs-import', 'import') },
     { blankLine : 'always', prev : '*', next : 'return' }],
   '@stylistic/semi-style'                  : ['error', 'last'],
   // The @stylistic default of 'always' for all seems at odd with general standards, which don't have space before
