@@ -9,16 +9,25 @@
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
 const { readFileSync } = require('node:fs')
+
 const { join } = require('node:path')
 
 const babelParser = require('@babel/eslint-parser')
+
 const stylistic = require('@stylistic/eslint-plugin')
+
 const globalsPkg = require('globals')
+
 const importPlugin = require('eslint-plugin-import')
+
 const jsdocPlugin = require('eslint-plugin-jsdoc')
+
 const nodePlugin = require('eslint-plugin-node')
+
 const promisePlugin = require('eslint-plugin-promise')
+
 const nPlugin = require('eslint-plugin-n')
+
 const standardPlugin = require('eslint-config-standard')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
@@ -79,7 +88,7 @@ const plugins = Object.assign({
 },
 stylisticConfig.plugins) // this names the plugin '@stylistic'
 
-linebreakTypes = [
+const linebreakTypes = [
   'block',
   'block-like',
   'break',
@@ -124,6 +133,7 @@ const linbreakTypesExcept = (...types) => {
   for (const type of types) {
     result.splice(result.indexOf(type), 1)
   }
+
   return result
 }
 
@@ -143,10 +153,10 @@ const rules = {
   '@stylistic/function-paren-newline'          : ['error', 'consistent'],
   '@stylistic/max-statements-per-line'         : ['error', { max : 2 }], // allow for short one-liners
   '@stylistic/padding-line-between-statements' : ['error',
-    { blankLine: 'always', prev: '*', next: 'class'},
+    { blankLine : 'always', prev : '*', next : 'class' },
     { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'export' },
     { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'cjs-export' },
-    { blankLine: 'always', prev: ['cjs-import', 'import'], next: linbreakTypesExcept('cjs-import', 'import') },
+    { blankLine : 'always', prev : ['cjs-import', 'import'], next : linbreakTypesExcept('cjs-import', 'import') },
     { blankLine : 'always', prev : '*', next : 'return' }],
   '@stylistic/semi-style'                  : ['error', 'last'],
   // The @stylistic default of 'always' for all seems at odd with general standards, which don't have space before
