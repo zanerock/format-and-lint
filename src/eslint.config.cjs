@@ -156,7 +156,13 @@ const rules = {
     { blankLine : 'always', prev : '*', next : 'class' },
     { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'export' },
     { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'cjs-export' },
-    { blankLine : 'always', prev : ['cjs-import', 'import'], next : linbreakTypesExcept('cjs-import', 'import') },
+    { blankLine : 'always', prev : 'import', next : linbreakTypesExcept('import') },
+    // { blankLine : 'always', prev : 'cjs-import', next : linbreakTypesExcept('cjs-import') },
+    { 
+      blankLine : 'always',
+      prev : 'cjs-import', 
+      next : linbreakTypesExcept('cjs-import', 'const', 'let', 'singleline-const', 'singleline-let', 'singleline-var', 'var'),
+    },
     { blankLine : 'always', prev : '*', next : 'return' }],
   '@stylistic/semi-style'                  : ['error', 'last'],
   // The @stylistic default of 'always' for all seems at odd with general standards, which don't have space before
@@ -198,6 +204,7 @@ const rules = {
 // @stylistic rules control).
 delete rules['brace-style'] // they want 1tbs, we want stroustrup
 delete rules['comma-dangle'] // they so no, we say multiline
+delete rules['eol-last'] // redundant with @stylistic
 delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 delete rules['space-before-function-paren'] // we override default and redundant anyway

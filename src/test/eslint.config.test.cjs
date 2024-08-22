@@ -2,7 +2,6 @@
  * @file Tests the config works as expected based on a sampling of rules.
  */
 const { resolve } = require('node:path')
-
 const { FlatESLint } = require('eslint/use-at-your-own-risk') /* eslint-disable-line node/no-missing-require */
 
 describe('eslint.config.cjs', () => {
