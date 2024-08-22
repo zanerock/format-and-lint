@@ -158,10 +158,10 @@ const rules = {
     { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'cjs-export' },
     { blankLine : 'always', prev : 'import', next : linbreakTypesExcept('import') },
     // { blankLine : 'always', prev : 'cjs-import', next : linbreakTypesExcept('cjs-import') },
-    { 
+    {
       blankLine : 'always',
-      prev : 'cjs-import', 
-      next : linbreakTypesExcept('cjs-import', 'const', 'let', 'singleline-const', 'singleline-let', 'singleline-var', 'var'),
+      prev      : 'cjs-import',
+      next      : linbreakTypesExcept('cjs-import', 'const', 'let', 'singleline-const', 'singleline-let', 'singleline-var', 'var'),
     },
     { blankLine : 'always', prev : '*', next : 'return' }],
   '@stylistic/semi-style'                  : ['error', 'last'],
