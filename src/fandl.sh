@@ -24,7 +24,7 @@ fi
 
 PRETTIER_IGNORE_OPTIONS='--ignore-path ./.gitignore'
 if [[ -z ${CHECK_DATA_FILES} ]]; then
-  PRETTIER_IGNORE_OPTIONS="${PRETTIER_IGNORE_OPTIONS} --ignore-path '${PRETTIER_IGNORE}'"
+  PRETTIER_IGNORE_OPTIONS="${PRETTIER_IGNORE_OPTIONS} --ignore-path ${PRETTIER_IGNORE}"
 fi
 
 if [[ $1 == '--check' ]]; then
