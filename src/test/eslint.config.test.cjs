@@ -39,8 +39,7 @@ describe('eslint.config.cjs', () => {
     delete process.env.CHECK_DATA_FILES
 
     const formatFiles = formatTests.map(([, testDir]) =>
-      join('src', 'test', 'data', 'formatting', testDir)
-    )
+      join('src', 'test', 'data', 'formatting', testDir))
 
     tryExec(`git checkout '${formatFiles.join("' '")}'`)
   })
