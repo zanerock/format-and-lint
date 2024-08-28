@@ -72,9 +72,7 @@ describe('eslint.config.cjs', () => {
     })
   })
 
-  test.each([
-    
-  ])('%s', (description, testDir) => {
+  test.each(formatTests)('%s', (description, testDir) => {
     testDir = resolve(__dirname, 'data', 'formatting', testDir)
     const file = resolve(testDir, 'index.mjs')
     const formattedFile = resolve(testDir, 'formatted.txt')
