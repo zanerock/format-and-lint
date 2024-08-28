@@ -6,13 +6,13 @@ SRC:=src
 DIST:=dist
 QA:=qa
 
-ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js" -o -name "*.cjs")
+ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js" -o -name "*.cjs" -o -name "*.mjs")
 
 BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.config.cjs
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
 # BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
-CONFIG_FILES_SRC:=$(SRC)/eslint.config.cjs $(SRC)/prettierrc.yaml
+CONFIG_FILES_SRC:=$(SRC)/eslint.config.cjs $(SRC)/prettierrc.yaml $(SRC)/prettierignore
 CONFIG_FILES_DIST:=$(patsubst $(SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
 
 BIN_SRC:=$(SRC)/fandl.sh
@@ -36,9 +36,10 @@ $(BIN_DIST): $(DIST)/%: $(SRC)/%
 JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' npx jest
 TEST_REPORT:=$(QA)/unit-test.txt
 TEST_PASS_MARKER:=$(QA)/.unit-test.passed
+BUILD_TARGETS:=$(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST) $(BIN_DIST)
 PRECIOUS_TARGETS+=$(TEST_REPORT)
 
-$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
+$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(TEST_REPORT)
 	git rev-parse HEAD >> $(TEST_REPORT)
@@ -48,28 +49,23 @@ $(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) $(CONFIG_
 		| tee -a $(TEST_REPORT); \
 		touch $(TEST_PASS_MARKER) )
 
-ESLINT:=npx eslint
+FANDL:=./dist/fandl.sh
 LINT_REPORT:=$(QA)/lint.txt
 LINT_PASS_MARKER:=$(QA)/.lint.passed
 PRECIOUS_TARGETS+=$(LINT_REPORT)
 
-$(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(CONFIG_FILES_DIST)
+$(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(LINT_REPORT)
 	git rev-parse HEAD >> $(LINT_REPORT)
 	( set -e; set -o pipefail; \
-	  ESLINT_USE_FLAT_CONFIG=true $(ESLINT) \
-	    --config $(CONFIG_FILES_DIST) \
-	    . \
+		$(FANDL) --check \
 	    | tee -a $(LINT_REPORT); \
 	  touch $(LINT_PASS_MARKER) )
 
-lint-fix: $(CONFIG_FILES_DIST)
+lint-fix: $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
 	@( set -e; set -o pipefail; \
-	  ESLINT_USE_FLAT_CONFIG=true $(ESLINT) \
-	    --config $(CONFIG_FILES_DIST) \
-	    $(LINT_IGNORE_PATTERNS) \
-	    --fix . )
+	  $(FANDL) )
 
 test: $(TEST_REPORT) $(TEST_PASS_MARKER)
 

@@ -50,7 +50,8 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-optional-chaining": "^7.21.0"
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@liquid-labs/shell-toolkit": "^1.0.0-alpha.10"
   },
   "_sdlc": {
     "linting": {
