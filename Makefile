@@ -12,8 +12,11 @@ BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.con
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
 # BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
-CONFIG_FILES_SRC:=$(SRC)/eslint.config.cjs
+CONFIG_FILES_SRC:=$(SRC)/eslint.config.cjs $(SRC)/prettierrc.yaml
 CONFIG_FILES_DIST:=$(patsubst $(SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
+
+BIN_SRC:=$(SRC)/fandl.sh
+BIN_DIST:=$(patsubst $(SRC)/%, $(DIST)/%, $(BIN_SRC))
 
 default: all
 
@@ -24,6 +27,11 @@ $(CONFIG_FILES_DIST): $(DIST)/%: $(SRC)/%
 $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 	mkdir -p $(dir $@)
 	cp $< $@
+
+$(BIN_DIST): $(DIST)/%: $(SRC)/%
+	mkdir -p $(dir $@)
+	cp $< $@
+	chmod a+x $@
 
 JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' npx jest
 TEST_REPORT:=$(QA)/unit-test.txt
@@ -69,7 +77,7 @@ lint: $(LINT_REPORT) $(LINT_PASS_MARKER)
 
 qa: test lint
 
-build: $(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST)
+build: $(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST) $(BIN_DIST)
 
 all: build
 

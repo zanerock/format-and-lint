@@ -9,25 +9,15 @@
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
 const { readFileSync } = require('node:fs')
-
 const { join } = require('node:path')
-
 const babelParser = require('@babel/eslint-parser')
-
 const stylistic = require('@stylistic/eslint-plugin')
-
 const globalsPkg = require('globals')
-
 const importPlugin = require('eslint-plugin-import')
-
 const jsdocPlugin = require('eslint-plugin-jsdoc')
-
 const nodePlugin = require('eslint-plugin-node')
-
 const promisePlugin = require('eslint-plugin-promise')
-
 const nPlugin = require('eslint-plugin-n')
-
 const standardPlugin = require('eslint-config-standard')
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
@@ -145,13 +135,45 @@ const rules = {
   // override to allow avoiding escapes
   '@stylistic/quotes'                          : ['error', 'single', { allowTemplateLiterals : true, avoidEscape : true }],
   // additional rules
-  '@stylistic/arrow-parens'                    : ['error', 'always'],
+  '@stylistic/arrow-parens'                    : ['error', 'always'], // I like this to be consistent
   '@stylistic/array-bracket-newline'           : ['error', 'consistent'],
   '@stylistic/array-element-newline'           : ['error', 'consistent'],
+  '@stylistic/comma-dangle'                    : ['error', {
+        arrays: 'always-multiline',
+        objects: 'always-multiline',
+        imports: 'never',
+        exports: 'never',
+        functions: 'never'
+    }],
   '@stylistic/function-call-argument-newline'  : ['error', 'consistent'],
   '@stylistic/function-call-spacing'           : ['error', 'never'],
   '@stylistic/function-paren-newline'          : ['error', 'consistent'],
+  '@stylistic/indent': ['error', 2, {
+    ArrayExpression: 1,
+    CallExpression: { arguments: 1 },
+    flatTernaryExpressions: false,
+    FunctionDeclaration: { body: 1, parameters: 1 },
+    FunctionExpression: { body: 1, parameters: 1 },
+    ignoreComments: false,
+    ignoredNodes: [
+      'TSUnionType',
+      'TSIntersectionType',
+      'TSTypeParameterInstantiation',
+      'FunctionExpression > .params[decorators.length > 0]',
+      'FunctionExpression > .params > :matches(Decorator, :not(:first-child))',
+    ],
+    ImportDeclaration: 1,
+    MemberExpression: 1,
+    ObjectExpression: 1,
+    offsetTernaryExpressions: true,
+    outerIIFEBody: 1,
+    SwitchCase: 1,
+    VariableDeclarator: 4,
+  }],
+  // '@stylistic/indent-binary-ops': ['error', 4], // same as default, but since we define indent, these two go together
   '@stylistic/max-statements-per-line'         : ['error', { max : 2 }], // allow for short one-liners
+  // The default is just 'before'; but equals are special. IMO.
+  '@stylistic/operator-linebreak' : ['error', 'before', { overrides : { '=' : 'after', '-=': 'after', '+=': 'after' }}],
   '@stylistic/padding-line-between-statements' : ['error',
     { blankLine : 'always', prev : '*', next : 'class' },
     { blankLine : 'always', prev : linbreakTypesExcept('cjs-export', 'export'), next : 'export' },
@@ -161,6 +183,7 @@ const rules = {
     {
       blankLine : 'always',
       prev      : 'cjs-import',
+      // Because a cjs-import is actually many different things...
       next      : linbreakTypesExcept('cjs-import', 'const', 'let', 'singleline-const', 'singleline-let', 'singleline-var', 'var'),
     },
     { blankLine : 'always', prev : '*', next : 'return' }],
@@ -185,29 +208,23 @@ const rules = {
   // which we need to import for react to work, even when not used
   'no-unused-vars'                         : ['error', { varsIgnorePattern : 'React' }],
   // this is our one modification to JS Standard style
-  'key-spacing'                            : ['error', {
-    singleLine : {
-      beforeColon : true,
-      afterColon  : true,
-      mode        : 'strict',
-    },
-    multiLine : {
-      beforeColon : true,
-      afterColon  : true,
-      align       : 'colon',
-    },
-  }],
   'prefer-regex-literals' : 'error',
 }
 
 // OK, so the standard plugin provides lots of nice rules, but there are some conflicts, so we delete them (and let the
 // @stylistic rules control).
+delete rules['block-spacing'] // redundant with @stylistic
 delete rules['brace-style'] // they want 1tbs, we want stroustrup
 delete rules['comma-dangle'] // they so no, we say multiline
 delete rules['eol-last'] // redundant with @stylistic
+delete rules['indent'],
+delete rules['indent-binary-ops'],
+delete rules['key-spacing'] // redundant with @stylistic
 delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 delete rules['space-before-function-paren'] // we override default and redundant anyway
+// delete rules['@stylistic/indent']
+delete rules['@stylistic/indent-binary-ops']
 
 /* // react now covered by stylistic
 if (usesReact === true) {

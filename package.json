@@ -5,6 +5,9 @@
   "files": [
     "dist/"
   ],
+  "bin": {
+    "fandl": "./dist/fandl.sh"
+  },
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
@@ -42,7 +45,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "globals": "^14.0.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
