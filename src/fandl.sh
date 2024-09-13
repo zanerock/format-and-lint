@@ -6,6 +6,10 @@ else
   SELF="$0"
 fi
 
+if [[ -n "$1" ]]; then
+  FORMAT_FILES="$1"
+fi
+
 BASE_DIR="$(dirname ${SELF})"
 ESLINT_CONFIG="${BASE_DIR}/eslint.config.cjs"
 PRETTIER_CONFIG="${BASE_DIR}/prettierrc.yaml"
@@ -42,5 +46,5 @@ else
   ESLINT_USE_FLAT_CONFIG=true ${ESLINT} \
     --config "${ESLINT_CONFIG}" \
     --fix \
-    .
+    $(if [[ -n "$FORMAT_FILES" ]]; then echo "--no-ignore ${FORMAT_FILES}"; else echo '.'; fi)
 fi

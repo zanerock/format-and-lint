@@ -44,9 +44,6 @@ describe('eslint.config.cjs', () => {
 
     tryExec(`git checkout '${formatFiles.join("' '")}'`)
   })
-  afterEach(() => {
-    delete process.env.FORMAT_FILES
-  })
 
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
     const eslint = new FlatESLint({
@@ -77,8 +74,7 @@ describe('eslint.config.cjs', () => {
     const file = resolve(testDir, 'index.mjs')
     const formattedFile = resolve(testDir, 'formatted.txt')
 
-    process.env.FORMAT_FILES = file
-    tryExec('./dist/fandl.sh')
+    tryExec(`./dist/fandl.sh ${file}`)
 
     const fileContents = readFileSync(file, { encoding : 'utf8' })
     const formattedFileConents = readFileSync(formattedFile, {
