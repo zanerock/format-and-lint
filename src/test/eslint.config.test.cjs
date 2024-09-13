@@ -26,6 +26,7 @@ describe('eslint.config.cjs', () => {
 
   const formatTests = [
     ['correctly formats boolean operators in if statement', 'boolean-ops'],
+    ['correctly places required semicolon', 'necessary-semicolon'],
   ]
 
   beforeAll(() => {
