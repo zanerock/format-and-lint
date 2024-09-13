@@ -22,6 +22,11 @@ describe('eslint.config.cjs', () => {
       'dangling-commas',
       ['@stylistic/comma-dangle', '@stylistic/comma-dangle'],
     ],
+    [
+      'detects Windows style newlines',
+      'windows-style-newline',
+      ['@stylistic/linebreak-style'],
+    ],
   ]
 
   const formatTests = [

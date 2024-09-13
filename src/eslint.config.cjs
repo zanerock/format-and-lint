@@ -203,6 +203,7 @@ const rules = {
       VariableDeclarator       : 4,
     },
   ],
+  '@stylistic/linebreak-style'         : ['error', 'unix'],
   // '@stylistic/indent-binary-ops': ['error', 4], // same as default, but since we define indent, these two go together
   '@stylistic/max-statements-per-line' : ['error', { max : 2 }], // allow for short one-liners
   // The default is just 'before'; but equals are special. IMO.
