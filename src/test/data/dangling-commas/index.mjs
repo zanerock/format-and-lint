@@ -4,11 +4,11 @@ import {
 
 // we expect dangling commas in data structures
 const foo = {
-  bar : blah // should have comma!
+  bar : blah, // should have comma!
 }
 
 const bar = [
-  1 // should have comma!
+  1, // should have comma!
 ]
 
 // but not function decls
