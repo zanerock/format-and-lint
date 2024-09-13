@@ -22,6 +22,11 @@ describe('eslint.config.cjs', () => {
       'dangling-commas',
       ['@stylistic/comma-dangle', '@stylistic/comma-dangle'],
     ],
+    [
+      'detects Windows style newlines',
+      'windows-style-newline',
+      ['@stylistic/linebreak-style', '@stylistic/linebreak-style'],
+    ],
   ]
 
   const formatTests = [
@@ -62,11 +67,9 @@ describe('eslint.config.cjs', () => {
     // console.log(JSON.stringify(results, null, '  ')) // DEBUG
 
     expect(results).toHaveLength(1)
-    expect(results[0].errorCount).toBe(ruleIds.length)
-    expect(results[0].messages).toHaveLength(ruleIds.length)
-    ruleIds.forEach((ruleId, i) => {
-      expect(results[0].messages[i].ruleId).toBe(ruleId)
-    })
+    // do this first so we get info about the failed rules
+    const failedRules = results[0].messages.map((m) => m.ruleId)
+    expect(failedRules).toEqual(ruleIds)
   })
 
   test.each(formatTests)('%s', (description, testDir) => {
