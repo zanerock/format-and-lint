@@ -246,6 +246,8 @@ const rules = {
     },
     { blankLine : 'always', prev : '*', next : 'return' },
   ],
+  // prettier insists on putting required semi-colons first, which is probably the better answer since it's more
+  // resilient to code changes
   '@stylistic/semi-style'                  : ['error', 'first'],
   // The @stylistic default of 'always' for all seems at odd with general standards, which don't have space before
   // named functions. I like that because when we invoke a function, you never see a space, and I see no reason to
