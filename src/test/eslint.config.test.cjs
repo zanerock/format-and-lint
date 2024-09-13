@@ -26,6 +26,7 @@ describe('eslint.config.cjs', () => {
 
   const formatTests = [
     ['correctly formats boolean operators in if statement', 'boolean-ops'],
+    ['correctly places required semicolon', 'necessary-semicolon'],
   ]
 
   beforeAll(() => {
@@ -42,9 +43,6 @@ describe('eslint.config.cjs', () => {
       join('src', 'test', 'data', 'formatting', testDir))
 
     tryExec(`git checkout '${formatFiles.join("' '")}'`)
-  })
-  afterEach(() => {
-    delete process.env.FORMAT_FILES
   })
 
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
@@ -76,8 +74,7 @@ describe('eslint.config.cjs', () => {
     const file = resolve(testDir, 'index.mjs')
     const formattedFile = resolve(testDir, 'formatted.txt')
 
-    process.env.FORMAT_FILES = file
-    tryExec('./dist/fandl.sh')
+    tryExec(`./dist/fandl.sh ${file}`)
 
     const fileContents = readFileSync(file, { encoding : 'utf8' })
     const formattedFileConents = readFileSync(formattedFile, {

@@ -21,5 +21,5 @@ baz('blah')
 
 export {
   foo,
-  bar
+  bar // should NOT have comma
 }
