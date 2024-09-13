@@ -16,3 +16,5 @@ const foo = () =>
     variable6) ||
   variable4 ||
   !(variable4 && !variable3)
+
+export { foo }
