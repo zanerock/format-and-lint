@@ -1,4 +1,4 @@
-# @liquid-labs/sdlc-resource-eslint
+# @pkgdev/sdlc-resource-eslint
 
 Pre-configured formatting and style tool combining prettier and eslint.
 
