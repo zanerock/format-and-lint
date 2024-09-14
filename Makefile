@@ -3,6 +3,8 @@
 SHELL:=bash
 
 SRC:=src
+LIB_SRC:=$(SRC)/lib
+BIN_SRC:=$(SRC)/cli
 DIST:=dist
 QA:=qa
 
@@ -12,15 +14,15 @@ BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.con
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
 # BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
-CONFIG_FILES_SRC:=$(SRC)/eslint.config.cjs $(SRC)/prettierrc.yaml $(SRC)/prettierignore
-CONFIG_FILES_DIST:=$(patsubst $(SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
+CONFIG_FILES_SRC:=$(LIB_SRC)/eslint.config.cjs $(LIB_SRC)/prettierrc.yaml $(LIB_SRC)/prettierignore
+CONFIG_FILES_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
 
-BIN_SRC:=$(SRC)/fandl.sh
-BIN_DIST:=$(patsubst $(SRC)/%, $(DIST)/%, $(BIN_SRC))
+BIN_SRC_FILES:=$(LIB_SRC)/fandl.sh
+BIN_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(BIN_SRC_FILES))
 
 default: all
 
-$(CONFIG_FILES_DIST): $(DIST)/%: $(SRC)/%
+$(CONFIG_FILES_DIST): $(DIST)/%: $(LIB_SRC)/%
 	mkdir -p $(dir $@)
 	cp $< $@
 
@@ -28,7 +30,7 @@ $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 	mkdir -p $(dir $@)
 	cp $< $@
 
-$(BIN_DIST): $(DIST)/%: $(SRC)/%
+$(BIN_DIST): $(DIST)/%: $(BIN_SRC)/%
 	mkdir -p $(dir $@)
 	cp $< $@
 	chmod a+x $@
