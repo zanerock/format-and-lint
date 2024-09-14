@@ -53,6 +53,9 @@
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@liquid-labs/shell-toolkit": "^1.0.0-alpha.10"
   },
+  "_comply": {
+    "orgKey": "@liquid-labs"
+  },
   "_sdlc": {
     "linting": {
       "ignores": [
