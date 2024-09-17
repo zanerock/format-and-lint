@@ -8,22 +8,38 @@
  * Our one exception to the standard style is implementing aligned colons on multiline
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
-const { readFileSync } = require('node:fs')
-const { join } = require('node:path')
-const babelParser = require('@babel/eslint-parser')
-const stylistic = require('@stylistic/eslint-plugin')
-const globalsPkg = require('globals')
-const importPlugin = require('eslint-plugin-import')
-const jsdocPlugin = require('eslint-plugin-jsdoc')
-const nodePlugin = require('eslint-plugin-node')
-const promisePlugin = require('eslint-plugin-promise')
-const nPlugin = require('eslint-plugin-n')
-const standardPlugin = require('eslint-config-standard')
+import { existsSync, readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import globalsPkg from 'globals'
+import importPlugin from 'eslint-plugin-import'
+import jsdocPlugin from 'eslint-plugin-jsdoc'
+import nodePlugin from 'eslint-plugin-node'
+import promisePlugin from 'eslint-plugin-promise'
+import nPlugin from 'eslint-plugin-n'
+import babelParser from '@babel/eslint-parser'
+import { fixupPluginRules } from "@eslint/compat"
+import stylistic from '@stylistic/eslint-plugin'
+import standardPlugin from 'eslint-config-standard'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const babelConfigPathInstalled = join(__dirname, 'babel', 'babel.config.cjs')
+const babelConfigPathTest = join('dist', 'babel', 'babel.config.cjs')
+
+const babelConfigPath = existsSync(babelConfigPathInstalled) === true
+  ? babelConfigPathInstalled
+  : existsSync(babelConfigPathTest)
+    ? babelConfigPathTest
+    : undefined
+if (babelConfigPath === undefined) {
+  throw new Error('Could not find babel config file.')
+}
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
 const {
-  _sdlc,
   dependencies = {},
   devDependencies = {},
   engines = { node : true },
@@ -43,46 +59,6 @@ catch (e) {
 const usesReact =
   dependencies.react !== undefined || devDependencies.react !== undefined
 const reactSettings = usesReact ? { version : 'detect' } : {}
-
-// first we set up the files to ignore by reading out '.gitignore'
-const commonIgnores = ['doc/**', 'dist/**']
-if (process.env.CHECK_DATA_FILES === undefined) {
-  commonIgnores.push('**/test/data/**/*')
-}
-
-if (
-  gitignoreContents !== undefined
-  && process.env.SDLC_LINT_SKIP_GITIGNORE !== 'true'
-) {
-  const gitignoreLines = gitignoreContents.split(/\r?\n/)
-  for (const gitIgnore of gitignoreLines) {
-    if (gitIgnore.trim() === '') continue
-
-    let newIgnore
-    if (gitIgnore.startsWith('/')) {
-      newIgnore = gitIgnore.slice(1)
-    }
-    else {
-      newIgnore = '**/' + gitIgnore
-    }
-    if (!newIgnore.endsWith('/')) {
-      newIgnore += '/'
-    }
-    newIgnore += '**'
-
-    commonIgnores.push(newIgnore)
-  }
-}
-
-// we also include any ignores from the package.json
-if (
-  _sdlc !== undefined
-  && _sdlc.linting !== undefined
-  && process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES !== 'true'
-) {
-  const { ignores } = _sdlc.linting
-  commonIgnores.push(...ignores)
-}
 
 const stylisticConfig = stylistic.configs['recommended-flat']
 
@@ -147,7 +123,7 @@ const linbreakTypesExcept = (...types) => {
 }
 
 const rules = {
-  ...standardPlugin.rules,
+  // ...standardPlugin.rules,
   ...stylisticConfig.rules,
   // override key spacing to get things aligned
   '@stylistic/key-spacing' : [
@@ -303,9 +279,6 @@ const files =
     : [process.env.FORMAT_FILES]
 
 const eslintConfig = [
-  // setting 'ignores' like this excludes the matching files from any processing; setting 'ignores' with 'files' in the
-  // same object only excludes the ignored files from those rules but not from being processed alltogether
-  { ignores : commonIgnores },
   // general standard rules; the react rules have to go here to or else ESLint thinks components aren't used and
   // triggers the 'no-unused-vars' rule
   {
@@ -316,7 +289,7 @@ const eslintConfig = [
         sourceType        : 'module',
         requireConfigFile : true,
         babelOptions      : {
-          configFile : join(__dirname, 'babel', 'babel.config.cjs'),
+          configFile : babelConfigPath,
         },
         ecmaFeatures : { jsx : true },
       },
@@ -329,7 +302,7 @@ const eslintConfig = [
   // jsdoc rules
   {
     files,
-    ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
+    ignores : ['** /index.{js,cjs,mjs}', '** /__tests__/** /*', '** /*.test.*'],
     plugins : { jsdoc : jsdocPlugin },
     rules   : {
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
@@ -342,19 +315,19 @@ const eslintConfig = [
   },
   // add necessary globals and react settinsg when processing JSX files
   {
-    files           : ['**/*.jsx'],
+    files           : ['** /*.jsx'],
     languageOptions : { globals : globalsPkg.browser },
   },
   // adds correct globals when processing jest tests
   {
-    files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
+    files           : ['** /_tests_/**', '** /*.test.{cjs,js,jsx,mjs}'],
     languageOptions : { globals : globalsPkg.jest },
   },
 ]
 
 if (engines?.node !== undefined) {
   eslintConfig.push({
-    files           : ['**/*.{cjs,js,jsx,mjs}'],
+    files           : ['** /*.{cjs,js,jsx,mjs}'],
     plugins         : { node : nodePlugin },
     languageOptions : {
       // globals used to define structuredClone (I'm pretty sure), but now doesn't for some reason...
@@ -375,4 +348,4 @@ if (engines?.node !== undefined) {
   })
 }
 
-module.exports = eslintConfig
+export { eslintConfig }

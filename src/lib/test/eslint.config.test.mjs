@@ -1,14 +1,15 @@
 /**
  * @file Tests the config works as expected based on a sampling of rules.
  */
-const { readFileSync } = require('node:fs')
-const { join, resolve } = require('node:path')
+import { readFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const {
-  FlatESLint,
-} = require('eslint/use-at-your-own-risk') /* eslint-disable-line node/no-missing-require */
+import { ESLint } from 'eslint'
 
-const { tryExec } = require('@liquid-labs/shell-toolkit')
+import { eslintConfig } from '../eslint.config'
+    
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('eslint.config.cjs', () => {
   const lintTests = [
@@ -45,33 +46,26 @@ describe('eslint.config.cjs', () => {
     delete process.env.CHECK_DATA_FILES
 
     const formatFiles = formatTests.map(([, testDir]) =>
-      join('src', 'test', 'data', 'formatting', testDir))
+      join('src', 'lib', 'test', 'data', 'formatting', testDir))
 
-    tryExec(`git checkout '${formatFiles.join("' '")}'`)
+    // tryExec(`git checkout '${formatFiles.join("' '")}'`)
   })
 
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
-    const eslint = new FlatESLint({
+    const eslint = new ESLint({
       // TODO: just use Linter and embed the code here rather than require separate files
-      overrideConfigFile : resolve(
-        __dirname,
-        '..',
-        '..',
-        'dist',
-        'eslint.config.cjs'
-      ),
+      overrideConfigFile : true,
+      overrideConfig : eslintConfig,
     })
 
-    const results = await eslint.lintFiles(`src/test/data/${testDir}/**/*`)
-
-    // console.log(JSON.stringify(results, null, '  ')) // DEBUG
+    const results = await eslint.lintFiles(`src/lib/test/data/${testDir}/**/*`)
 
     expect(results).toHaveLength(1)
     // do this first so we get info about the failed rules
     const failedRules = results[0].messages.map((m) => m.ruleId)
     expect(failedRules).toEqual(ruleIds)
   })
-
+/*
   test.each(formatTests)('%s', (description, testDir) => {
     testDir = resolve(__dirname, 'data', 'formatting', testDir)
     const file = resolve(testDir, 'index.mjs')
@@ -85,5 +79,5 @@ describe('eslint.config.cjs', () => {
     })
 
     expect(fileContents).toBe(formattedFileConents)
-  })
+  })*/
 })

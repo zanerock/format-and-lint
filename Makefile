@@ -14,11 +14,11 @@ BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.con
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
 # BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
-CONFIG_FILES_SRC:=$(LIB_SRC)/eslint.config.cjs $(LIB_SRC)/prettierrc.yaml $(LIB_SRC)/prettierignore
+CONFIG_FILES_SRC:=$(LIB_SRC)/eslint.config.mjs
 CONFIG_FILES_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
 
-BIN_SRC_FILES:=$(LIB_SRC)/fandl.sh
-BIN_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(BIN_SRC_FILES))
+# BIN_SRC_FILES:=$(LIB_SRC)/fandl.sh
+# BIN_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(BIN_SRC_FILES))
 
 default: all
 
@@ -41,17 +41,17 @@ TEST_PASS_MARKER:=$(QA)/.unit-test.passed
 BUILD_TARGETS:=$(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST) $(BIN_DIST)
 PRECIOUS_TARGETS+=$(TEST_REPORT)
 
-$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
+$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) # $(BUILD_TARGETS)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(TEST_REPORT)
 	git rev-parse HEAD >> $(TEST_REPORT)
 	( set -e; set -o pipefail; \
 		$(JEST) \
-		--testRegex '(/__tests__/.*|(\.|/)(test|spec))\.c?[jt]sx?$\' \
+		--testRegex '(/__tests__/.*|(\.|/)(test|spec))\.m?[jt]sx?$\' \
 		| tee -a $(TEST_REPORT); \
 		touch $(TEST_PASS_MARKER) )
 
-FANDL:=./dist/fandl.sh
+# FANDL:=./dist/fandl.sh
 LINT_REPORT:=$(QA)/lint.txt
 LINT_PASS_MARKER:=$(QA)/.lint.passed
 PRECIOUS_TARGETS+=$(LINT_REPORT)
