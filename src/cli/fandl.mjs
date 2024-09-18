@@ -13,12 +13,7 @@ import { processFilePatternsFile } from './lib/process-file-patterns-file'
 import { processGitignore } from './lib/process-gitignore'
 import { processPackageIgnores } from './lib/process-package-ignores'
 
-const baseDir = __dirname
-const eslintConfigPath = join(baseDir, 'eslint.config.cjs')
-const prettierConfigPath = join(baseDir, 'prettierrc.yaml')
-
 const standardIgnores = ['**/test/data/**/*', 'doc/**', 'dist/**']
-
 
 const prettierBin = 'npx prettier'
 const eslintBin = 'npx eslint'

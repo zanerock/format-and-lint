@@ -53,7 +53,6 @@ describe('eslint.config.cjs', () => {
 
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
     const eslint = new ESLint({
-      // TODO: just use Linter and embed the code here rather than require separate files
       overrideConfigFile : true,
       overrideConfig : eslintConfig,
     })
