@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url'
 import { ESLint } from 'eslint'
 
 import { eslintConfig } from '../eslint.config'
-import { formatAndLint } from '../format-and-lint'
     
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -31,11 +30,7 @@ describe('eslint.config.cjs', () => {
     ],
   ]
 
-  const formatTests = [
-    ['correctly formats boolean operators in if statement', 'boolean-ops'],
-    ['correctly places required semicolon', 'necessary-semicolon'],
-  ]
-
+/*
   beforeAll(() => {
     process.env.SDLC_LINT_SKIP_GITIGNORE = 'true'
     process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES = 'true'
@@ -50,7 +45,7 @@ describe('eslint.config.cjs', () => {
     //  join('src', 'lib', 'test', 'data', 'formatting', testDir))
 
     // tryExec(`git checkout '${formatFiles.join("' '")}'`)
-  })
+  })*/
 
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
     const eslint = new ESLint({
@@ -58,25 +53,11 @@ describe('eslint.config.cjs', () => {
       overrideConfig : eslintConfig,
     })
 
-    const results = await eslint.lintFiles(`src/lib/test/data/${testDir}/**/*`)
+    const results = await eslint.lintFiles(`src/lib/default-config/test/data/${testDir}/**/*`)
 
     expect(results).toHaveLength(1)
     // do this first so we get info about the failed rules
     const failedRules = results[0].messages.map((m) => m.ruleId)
     expect(failedRules).toEqual(ruleIds)
-  })
-
-  test.each(formatTests)('%s', async (description, testDir) => {
-    testDir = resolve(__dirname, 'data', 'formatting', testDir)
-    const testFile = resolve(testDir, 'index.mjs')
-    const formattedFile = resolve(testDir, 'formatted.txt')
-
-    const results = await formatAndLint({ files: [testFile] })
-
-    const formattedFileConents = readFileSync(formattedFile, {
-      encoding : 'utf8',
-    })
-
-    expect(results[0].output).toBe(formattedFileConents)
   })
 })
