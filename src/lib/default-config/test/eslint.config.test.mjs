@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 import { ESLint } from 'eslint'
 
-import { eslintConfig } from '../eslint.config'
+import { getEslintConfig } from '../eslint.config'
     
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -33,7 +33,7 @@ describe('eslint.config.cjs', () => {
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
     const eslint = new ESLint({
       overrideConfigFile : true,
-      overrideConfig : eslintConfig,
+      overrideConfig : getEslintConfig(),
     })
 
     const results = await eslint.lintFiles(`src/lib/default-config/test/data/${testDir}/**/*`)

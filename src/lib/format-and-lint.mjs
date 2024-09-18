@@ -3,10 +3,10 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { ESLint } from 'eslint'
 import { format as prettierFormat } from 'prettier'
 
-import { eslintConfig as defaultEslintConfig } from './default-config/eslint.config'
+import { getEslintConfig } from './default-config/eslint.config'
 import { prettierConfig as defaultPrettierConfig } from './default-config/prettier.config'
 
-const formatAndLint = async ({ eslintConfig = defaultEslintConfig, files, prettierConfig = defaultPrettierConfig, write = false }) => {
+const formatAndLint = async ({ eslintConfig = getEslintConfig(), files, prettierConfig = defaultPrettierConfig, write = false }) => {
   const prettierParseConfig = structuredClone(prettierConfig)
   prettierParseConfig.parser = 'babel'
 

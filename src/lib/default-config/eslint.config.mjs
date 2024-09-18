@@ -45,17 +45,6 @@ const {
   engines = { node : true },
 } = packageJSON
 
-let gitignoreContents
-try {
-  gitignoreContents = readFileSync('./.gitignore', { encoding : 'utf8' })
-}
-catch (e) {
-  if (e.code !== 'ENOENT') {
-    throw e
-  }
-  // else, it's fine there is just no .gitignore
-}
-
 const usesReact =
   dependencies.react !== undefined || devDependencies.react !== undefined
 const reactSettings = usesReact ? { version : 'detect' } : {}
@@ -124,7 +113,7 @@ const linbreakTypesExcept = (...types) => {
 
 const rules = {
   ...standardPlugin.rules,
-  ...stylisticConfig.rules,
+  ...stylisticConfig.rules, // the stylistic rules also cover react rules
   // override key spacing to get things aligned
   '@stylistic/key-spacing' : [
     'error',
@@ -264,75 +253,35 @@ delete rules['key-spacing'] // redundant with @stylistic
 delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 delete rules['space-before-function-paren'] // we override default and redundant anyway
-// delete rules['@stylistic/indent']
-delete rules['@stylistic/indent-binary-ops']
+delete rules['@stylistic/indent-binary-ops'] // this is handled better by prettier
 
-/* // react now covered by stylistic
-if (usesReact === true) {
-  plugins.react = reactPlugin
-  Object.assign(rules, reactPlugin.configs.recommended.rules)
-} */
+const allFiles = ['**/*.{cjs,js,jsx,mjs}']
 
-const files =
-  process.env.FORMAT_FILES === undefined
-    ? ['**/*.{cjs,js,jsx,mjs}']
-    : [process.env.FORMAT_FILES]
-
-const eslintConfig = [
-  // general standard rules; the react rules have to go here to or else ESLint thinks components aren't used and
-  // triggers the 'no-unused-vars' rule
-  {
-    files,
-    languageOptions : {
-      parser        : babelParser,
-      parserOptions : {
-        sourceType        : 'module',
-        requireConfigFile : true,
-        babelOptions      : {
-          configFile : babelConfigPath,
-        },
-        ecmaFeatures : { jsx : true },
+const defaultBaseConfig = {
+  files: allFiles,
+  languageOptions : {
+    parser        : babelParser,
+    parserOptions : {
+      sourceType        : 'module',
+      requireConfigFile : true,
+      babelOptions      : {
+        configFile : babelConfigPath,
       },
-      ecmaVersion : 'latest',
+      ecmaFeatures : { jsx : true },
     },
-    settings : { react : reactSettings },
-    plugins,
-    rules,
+    ecmaVersion : 'latest',
   },
-  // jsdoc rules
-  {
-    files,
-    ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
-    plugins : { jsdoc : jsdocPlugin },
-    rules   : {
-      ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      'jsdoc/require-description' : 'error',
-      // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
-      // e.g., func(foo = true)), but if this is possible, it's not working for us.
-      'jsdoc/no-defaults'         : 'off',
-      'jsdoc/check-tag-names'     : ['error', { definedTags : ['category'] }],
-    },
-  },
-  // add necessary globals and react settinsg when processing JSX files
-  {
-    files           : ['**/*.jsx'],
-    languageOptions : { globals : globalsPkg.browser },
-  },
-  // adds correct globals when processing jest tests
-  {
-    files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
-    languageOptions : { globals : globalsPkg.jest },
-  },
-]
+  settings : { react : reactSettings },
+  plugins,
+  rules,
+}
 
 if (engines?.node !== undefined) {
-  eslintConfig.push({
-    files           : ['**/*.{cjs,js,jsx,mjs}'],
-    plugins         : { node : fixupPluginRules(nodePlugin) },
-    languageOptions : {
-      globals : globalsPkg.node, // TODO: actually, we don't want this for MJS files... but I'm not sure what we do want
-    },
-    rules : {
+  defaultBaseConfig.plugins.node = fixupPluginRules(nodePlugin)
+  // TODO: actually, we don't want this for MJS files... but I'm not sure what we do want
+  defaultBaseConfig.languageOptions.globals = globalsPkg.node
+  Object.assign(defaultBaseConfig.rules,
+    {
       ...nodePlugin.configs.recommended.rules,
       'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
       'node/prefer-promises/dns'               : 'error',
@@ -344,7 +293,49 @@ if (engines?.node !== undefined) {
         },
       ],
     },
-  })
+  )
 }
 
-export { eslintConfig }
+const defaultJsdocConfig = {
+  files: allFiles,
+  ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
+  plugins : { jsdoc : jsdocPlugin },
+  rules   : {
+    ...jsdocPlugin.configs['flat/recommended-error'].rules,
+    'jsdoc/require-description' : 'error',
+    // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
+    // e.g., func(foo = true)), but if this is possible, it's not working for us.
+    'jsdoc/no-defaults'         : 'off',
+    'jsdoc/check-tag-names'     : ['error', { definedTags : ['category'] }],
+  },
+}
+
+const defaultJsxConfig = {
+  files           : ['**/*.jsx'],
+  // add necessary globals when processing JSX files
+  languageOptions : { globals : globalsPkg.browser },
+}
+
+const defaultTestsConfig = {
+  files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
+  // adds correct globals when processing jest tests
+  languageOptions : { globals : globalsPkg.jest },
+}
+
+const getEslintConfig = ({
+  baseConfig = defaultBaseConfig, 
+  jsdocConfig = defaultJsdocConfig, 
+  jsxConfig = defaultJsxConfig, 
+  testsConfig = defaultTestsConfig,
+} = {}) => {
+  const eslintConfig = [
+    baseConfig,
+    jsdocConfig,
+    jsxConfig,
+    testsConfig,
+  ]
+
+  return eslintConfig
+}
+
+export { getEslintConfig }
