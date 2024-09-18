@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { ESLint } from 'eslint'
 
 import { eslintConfig } from '../eslint.config'
+import { formatAndLint } from '../format-and-lint'
     
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -45,8 +46,8 @@ describe('eslint.config.cjs', () => {
     delete process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES
     delete process.env.CHECK_DATA_FILES
 
-    const formatFiles = formatTests.map(([, testDir]) =>
-      join('src', 'lib', 'test', 'data', 'formatting', testDir))
+    //const formatFiles = formatTests.map(([, testDir]) =>
+    //  join('src', 'lib', 'test', 'data', 'formatting', testDir))
 
     // tryExec(`git checkout '${formatFiles.join("' '")}'`)
   })
@@ -64,19 +65,18 @@ describe('eslint.config.cjs', () => {
     const failedRules = results[0].messages.map((m) => m.ruleId)
     expect(failedRules).toEqual(ruleIds)
   })
-/*
-  test.each(formatTests)('%s', (description, testDir) => {
+
+  test.each(formatTests)('%s', async (description, testDir) => {
     testDir = resolve(__dirname, 'data', 'formatting', testDir)
-    const file = resolve(testDir, 'index.mjs')
+    const testFile = resolve(testDir, 'index.mjs')
     const formattedFile = resolve(testDir, 'formatted.txt')
 
-    tryExec(`./dist/fandl.sh ${file}`)
+    const results = await formatAndLint({ files: [testFile] })
 
-    const fileContents = readFileSync(file, { encoding : 'utf8' })
     const formattedFileConents = readFileSync(formattedFile, {
       encoding : 'utf8',
     })
 
-    expect(fileContents).toBe(formattedFileConents)
-  })*/
+    expect(results[0].output).toBe(formattedFileConents)
+  })
 })
