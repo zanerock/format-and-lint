@@ -8,7 +8,7 @@ import { find } from 'find-plus'
 import { format as prettierFormat } from 'prettier'
 
 import { cliSpec } from './cli-spec'
-import { extractPatternFromFile } rom './lib/extract-patterns-from-file'
+import { extractPatternFromFile } from './lib/extract-patterns-from-file'
 import { processFilePatternsFile } from './lib/process-file-patterns-file'
 import { processGitignore } from './lib/process-gitignore'
 import { processPackageIgnores } from './lib/process-package-ignores'
@@ -21,7 +21,7 @@ const eslintBin = 'npx eslint'
 const fandl = async () => {
   const options = commandLineArgs(cliSpec, { partial: true })
 
-  const targetPatterns = processFilePaterns(options.files, options['files-paths'])
+  const targetPatterns = processFilePatterns(options.files, options['files-paths'])
   if (targetPatterns.length === 0) {
     const rootSrcIndicatorFiles = ['index.js', 'index.mjs', 'index.cjs']
     if (rootSrcIndicatorFiles.some((f) => existsSync(join('.', f)))) {

@@ -1,5 +1,5 @@
 import { BooleanString } from 'string-input'
--
+
 const globalArguments = [
   { name: 'files', multiple: true, description: "A file patterns selecting target files to process. If neither this nor '--files-paths' is specified, then standard, predefined patterns will be used." },
   { name: 'files-paths', multiple: true, description: "A path to a file containing newline separated file patterns selecting files to process. If neither this nor '--files' is specified, then standard, predefined patterns will be used."},
@@ -22,7 +22,7 @@ const cliSpec = {
   ],
   commands: [
     { name: 'format-and-lint', description: 'Formats and runs lint checks on the target files.', arguments: globalArguments },
-    { name: 'lint' descirption: 'Runs lint checks on the target files.', arguments: globalArguments },
+    { name: 'lint', descirption: 'Runs lint checks on the target files.', arguments: globalArguments },
     /*{ name: 'show-eslint-config', description: 'Prints the effective eslint configuration to stdout.', arguments: globalArguments },
     { name: 'show-prettier-config', description: 'Prints the effective prettier configuration to stdout.', arguments: globalArguments },*/
     { 

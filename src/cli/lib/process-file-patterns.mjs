@@ -1,7 +1,7 @@
 import { extractPatternsFromFile } from './extract-patterns-from-file'
 
-const processFilePatterns = async (patterns = [], filePaths = []) => {
-  const patterns = [...patterns]
+const processFilePatterns = async (filePatterns = [], filePaths = []) => {
+  const patterns = [...filePatterns]
 
   for (const path of filePaths) {
     patterns.push(...(await extractPatternsFromFile(path)))
@@ -10,4 +10,4 @@ const processFilePatterns = async (patterns = [], filePaths = []) => {
   return patterns
 }
 
-export { processFilePatternsFile }
+export { processFilePatterns }

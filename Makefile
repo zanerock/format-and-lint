@@ -36,20 +36,28 @@ $(BIN_DIST): $(DIST)/%: $(BIN_SRC)/%
 	chmod a+x $@
 
 JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' npx jest
+JEST_CONFIG:=$(shell npm explore @liquid-labs/sdlc-resource-jest -- pwd)/dist/jest.config.js
 TEST_REPORT:=$(QA)/unit-test.txt
 TEST_PASS_MARKER:=$(QA)/.unit-test.passed
+COVERAGE_REPORTS:=$(QA)/coverage
 BUILD_TARGETS:=$(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST) $(BIN_DIST)
 PRECIOUS_TARGETS+=$(TEST_REPORT)
 
-$(TEST_REPORT) $(TEST_PASS_MARKER) &: package.json $(ALL_JS_FILES_SRC) # $(BUILD_TARGETS)
+$(TEST_REPORT) $(TEST_PASS_MARKER) $(COVERAGE_REPORTS) &: package.json $(ALL_JS_FILES_SRC) # $(BUILD_TARGETS)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(TEST_REPORT)
 	git rev-parse HEAD >> $(TEST_REPORT)
 	( set -e; set -o pipefail; \
+		SRJ_CWD_REL_PACKAGE_DIR=. \
 		$(JEST) \
-		--testRegex '(/__tests__/.*|(\.|/)(test|spec))\.m?[jt]sx?$\' \
+		--config=$(JEST_CONFIG) \
+		--test-match '**/test/**/*.test.mjs' \
+		$(TEST) 2>&1 \
 		| tee -a $(TEST_REPORT); \
 		touch $(TEST_PASS_MARKER) )
+	rm -rf $(COVERAGE_REPORTS)
+	mkdir -p $(COVERAGE_REPORTS)
+	cp -r ./coverage/* $(COVERAGE_REPORTS)
 
 # FANDL:=./dist/fandl.sh
 LINT_REPORT:=$(QA)/lint.txt
