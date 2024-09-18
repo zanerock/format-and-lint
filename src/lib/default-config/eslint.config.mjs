@@ -323,6 +323,7 @@ const defaultTestsConfig = {
 }
 
 const getEslintConfig = ({
+  additionalConfig = {},
   baseConfig = defaultBaseConfig, 
   jsdocConfig = defaultJsdocConfig, 
   jsxConfig = defaultJsxConfig, 
@@ -333,6 +334,7 @@ const getEslintConfig = ({
     jsdocConfig,
     jsxConfig,
     testsConfig,
+    additionalConfig,
   ]
 
   return eslintConfig

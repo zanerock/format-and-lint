@@ -6,7 +6,34 @@ import { format as prettierFormat } from 'prettier'
 import { getEslintConfig } from './default-config/eslint.config'
 import { prettierConfig as defaultPrettierConfig } from './default-config/prettier.config'
 
-const formatAndLint = async ({ eslintConfig = getEslintConfig(), files, prettierConfig = defaultPrettierConfig, write = false }) => {
+const formatAndLint = async ({ 
+  eslintConfig,
+  eslintAdditionalConfig,
+  eslintBaseConfig,
+  eslintJsdocConfig,
+  eslintJsxConfig,
+  eslintTestConfig,
+  files, 
+  prettierConfig = defaultPrettierConfig, 
+  write = false 
+}) => {
+  if (eslintConfig !== undefined && (eslintAdditionalConfig !== undefined || eslintBaseConfig !== undefined || eslintJsdocConfig !== undefined || eslintJsxConfig !== undefined || eslintTestConfig !== undefined)) {
+    throw new ArgumentInvalidError({ 
+      message: "You cannot define 'eslintConfig' and sub-type configurations.", 
+      hint: "Either define complete, standalone 'eslintConfig' or supply sub-component definitions." 
+    })
+  }
+
+  if (eslintConfig === undefined) {
+    eslintConfig = getEslintConfig({
+      additionalConfig: eslintAdditionalConfig,
+      baseConfig: eslintBaseConfig,
+      jsdocConfig: eslintJsdocConfig,
+      jsxConfig: eslintJsxConfig,
+      testConfig: eslintTestConfig
+    })
+  }
+
   const prettierParseConfig = structuredClone(prettierConfig)
   prettierParseConfig.parser = 'babel'
 
