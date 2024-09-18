@@ -30,23 +30,6 @@ describe('eslint.config.cjs', () => {
     ],
   ]
 
-/*
-  beforeAll(() => {
-    process.env.SDLC_LINT_SKIP_GITIGNORE = 'true'
-    process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES = 'true'
-    process.env.CHECK_DATA_FILES = 'true'
-  })
-  afterAll(() => {
-    delete process.env.SDLC_LINT_SKIP_GITIGNORE
-    delete process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES
-    delete process.env.CHECK_DATA_FILES
-
-    //const formatFiles = formatTests.map(([, testDir]) =>
-    //  join('src', 'lib', 'test', 'data', 'formatting', testDir))
-
-    // tryExec(`git checkout '${formatFiles.join("' '")}'`)
-  })*/
-
   test.each(lintTests)('%s', async (description, testDir, ruleIds) => {
     const eslint = new ESLint({
       overrideConfigFile : true,

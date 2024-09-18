@@ -15,22 +15,6 @@ describe('formatAndLint', () => {
     ['correctly places required semicolon', 'necessary-semicolon'],
   ]
 
-  /*beforeAll(() => {
-    process.env.SDLC_LINT_SKIP_GITIGNORE = 'true'
-    process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES = 'true'
-    process.env.CHECK_DATA_FILES = 'true'
-  })
-  afterAll(() => {
-    delete process.env.SDLC_LINT_SKIP_GITIGNORE
-    delete process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES
-    delete process.env.CHECK_DATA_FILES
-
-    //const formatFiles = formatTests.map(([, testDir]) =>
-    //  join('src', 'lib', 'test', 'data', 'formatting', testDir))
-
-    // tryExec(`git checkout '${formatFiles.join("' '")}'`)
-  })*/
-
   test.each(formatTests)('%s', async (description, testDir) => {
     testDir = resolve(__dirname, 'data', testDir)
     const testFile = resolve(testDir, 'index.mjs')
