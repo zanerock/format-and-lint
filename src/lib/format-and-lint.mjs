@@ -12,15 +12,17 @@ const formatAndLint = async ({ eslintConfig = defaultEslintConfig, files, pretti
 
   const eslint = new ESLint({
     fix : true,
+    // this keeps eslint from insisting on an eslint config file
     overrideConfigFile : true,
-    overrideConfig : eslintConfig,
+    baseConfig: eslintConfig,
   })
 
   const processSource = async (file) => {
     const readPromise = readFile(file, { encoding: 'utf8' })
     const inputSource = await readPromise
     const prettierSource = await prettierFormat(inputSource, prettierParseConfig)
-    const lintResults = await eslint.lintText(prettierSource)
+    const lintResults = await eslint.lintText(prettierSource, { filePath: file })
+
     const formattedText = lintResults[0].output || prettierSource
 
     if (write === true && inputSource !== formattedText) {

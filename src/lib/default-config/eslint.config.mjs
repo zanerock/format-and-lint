@@ -123,7 +123,7 @@ const linbreakTypesExcept = (...types) => {
 }
 
 const rules = {
-  // ...standardPlugin.rules,
+  ...standardPlugin.rules,
   ...stylisticConfig.rules,
   // override key spacing to get things aligned
   '@stylistic/key-spacing' : [
@@ -302,7 +302,7 @@ const eslintConfig = [
   // jsdoc rules
   {
     files,
-    ignores : ['** /index.{js,cjs,mjs}', '** /__tests__/** /*', '** /*.test.*'],
+    ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
     plugins : { jsdoc : jsdocPlugin },
     rules   : {
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
@@ -315,23 +315,22 @@ const eslintConfig = [
   },
   // add necessary globals and react settinsg when processing JSX files
   {
-    files           : ['** /*.jsx'],
+    files           : ['**/*.jsx'],
     languageOptions : { globals : globalsPkg.browser },
   },
   // adds correct globals when processing jest tests
   {
-    files           : ['** /_tests_/**', '** /*.test.{cjs,js,jsx,mjs}'],
+    files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
     languageOptions : { globals : globalsPkg.jest },
   },
 ]
 
 if (engines?.node !== undefined) {
   eslintConfig.push({
-    files           : ['** /*.{cjs,js,jsx,mjs}'],
-    plugins         : { node : nodePlugin },
+    files           : ['**/*.{cjs,js,jsx,mjs}'],
+    plugins         : { node : fixupPluginRules(nodePlugin) },
     languageOptions : {
-      // globals used to define structuredClone (I'm pretty sure), but now doesn't for some reason...
-      globals : { structuredClone : false, ...globalsPkg.node },
+      globals : globalsPkg.node, // TODO: actually, we don't want this for MJS files... but I'm not sure what we do want
     },
     rules : {
       ...nodePlugin.configs.recommended.rules,
