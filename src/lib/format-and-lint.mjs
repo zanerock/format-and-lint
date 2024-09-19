@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 
 import { ESLint } from 'eslint'
 import { format as prettierFormat } from 'prettier'
+import { ArgumentInvalidError } from 'standard-error-set'
 
 import { getEslintConfig } from './default-config/eslint.config'
 import { prettierConfig as defaultPrettierConfig } from './default-config/prettier.config'
