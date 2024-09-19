@@ -49,7 +49,8 @@ const formatAndLint = async ({
     const readPromise = readFile(file, { encoding: 'utf8' })
     const inputSource = await readPromise
     const prettierSource = await prettierFormat(inputSource, prettierParseConfig)
-    const lintResults = await eslint.lintText(prettierSource, { filePath: file })
+    // leave off the 'filePath' or else 'results[0].output' is undefined
+    const lintResults = await eslint.lintText(prettierSource/*, { filePath: file }*/)
 
     const formattedText = lintResults[0].output || prettierSource
 
