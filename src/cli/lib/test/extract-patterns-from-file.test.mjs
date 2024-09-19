@@ -1,14 +1,4 @@
-import { jest } from '@jest/globals'
-
-jest.unstable_mockModule('node:fs/promises', () => ({
-  readFile: async () =>
-`src2/*.mjs
-# foo
-  
-src/**/*.mjs
-
-`
-}))
+import './mock-read-file'
 
 describe('extractPatternsFromFile', () => {
   let extractPatternsFromFile
