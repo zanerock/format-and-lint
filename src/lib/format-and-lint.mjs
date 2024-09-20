@@ -7,32 +7,22 @@ import { ArgumentInvalidError } from 'standard-error-set'
 import { getEslintConfig } from './default-config/eslint.config'
 import { prettierConfig as defaultPrettierConfig } from './default-config/prettier.config'
 
-const formatAndLint = async ({ 
+const formatAndLint = async ({
+  check = false,
   eslintConfig,
-  eslintAdditionalConfig,
-  eslintBaseConfig,
-  eslintJsdocConfig,
-  eslintJsxConfig,
-  eslintTestConfig,
+  eslintConfigComponents,
   files, 
-  prettierConfig = defaultPrettierConfig, 
-  write = false 
+  prettierConfig = defaultPrettierConfig,
+  noWrite = false,
 }) => {
-  if (eslintConfig !== undefined && (eslintAdditionalConfig !== undefined || eslintBaseConfig !== undefined || eslintJsdocConfig !== undefined || eslintJsxConfig !== undefined || eslintTestConfig !== undefined)) {
+  if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
     throw new ArgumentInvalidError({ 
-      message: "You cannot define 'eslintConfig' and sub-type configurations.", 
-      hint: "Either define complete, standalone 'eslintConfig' or supply sub-component definitions." 
+      message: "You cannot define 'eslintConfig' and 'eslintConfigComponents' simultaneously.",
     })
   }
 
   if (eslintConfig === undefined) {
-    eslintConfig = getEslintConfig({
-      additionalConfig: eslintAdditionalConfig,
-      baseConfig: eslintBaseConfig,
-      jsdocConfig: eslintJsdocConfig,
-      jsxConfig: eslintJsxConfig,
-      testConfig: eslintTestConfig
-    })
+    eslintConfig = getEslintConfig(eslintConfigComponents)
   }
 
   const prettierParseConfig = structuredClone(prettierConfig)
@@ -48,13 +38,20 @@ const formatAndLint = async ({
   const processSource = async (file) => {
     const readPromise = readFile(file, { encoding: 'utf8' })
     const inputSource = await readPromise
-    const prettierSource = await prettierFormat(inputSource, prettierParseConfig)
+    const prettierSource = check === true 
+      ? inputSource
+      : await prettierFormat(inputSource, prettierParseConfig)
     // leave off the 'filePath' or else 'results[0].output' is undefined
     const lintResults = await eslint.lintText(prettierSource/*, { filePath: file }*/)
 
-    const formattedText = lintResults[0].output || prettierSource
+    // the output is undefined if there are no changes due to the linting, but there may be changes due to prettier, so 
+    // to keep the ultimate result consistent, we have to update output if prettier did something
+    if (lintResults[0].output === undefined && prettierSource !== inputSource) {
+      lintResults[0].output = prettierSource
+    }
+    const formattedText = lintResults[0].output
 
-    if (write === true && inputSource !== formattedText) {
+    if (check !== true && noWrite !== true && formattedText !== undefined) {
       await writeFile(file, formattedText, { encoding: 'utf8' })
     }
 

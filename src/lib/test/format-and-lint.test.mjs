@@ -13,15 +13,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const appKey = 'format-and-lint'
 
 describe('formatAndLint', () => {
-  test.each([
-    'eslintAdditionalConfig',
-    'eslintBaseConfig',
-    'eslintJsdocConfig',
-    'eslintJsxConfig',
-    'eslintTestConfig'
-  ])("raises error if 'eslintConfig' and '%s' defined", async (config) => {
-    const args = { eslintConfig: [] }
-    args[config] = {}
+  test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
+    const args = { check : true, eslintConfig : [], eslintConfigComponents: [] }
     try {
       // expect(() => formatAndLint(args)).toThrow(/You cannot define/)
       await formatAndLint(args)
@@ -41,7 +34,7 @@ describe('formatAndLint', () => {
     const testFile = resolve(testDir, 'index.mjs')
     const formattedFile = resolve(testDir, 'formatted.txt')
 
-    const results = await formatAndLint({ files: [testFile] })
+    const results = await formatAndLint({ noWrite : true, files: [testFile] })
 
     const formattedFileContents = await readFile(formattedFile, {
       encoding : 'utf8',
@@ -64,7 +57,7 @@ describe('formatAndLint', () => {
 
       const formattedExample = resolve(testDirSrc, 'formatted.txt')
 
-      await formatAndLint({ files: [testFile], write: true })
+      await formatAndLint({ files: [testFile] })
 
       const formattedExampleConents = await readFile(formattedExample, {
         encoding : 'utf8',

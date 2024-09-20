@@ -51,7 +51,6 @@ $(TEST_REPORT) $(TEST_PASS_MARKER) $(COVERAGE_REPORTS) &: package.json $(ALL_JS_
 		SRJ_CWD_REL_PACKAGE_DIR=. \
 		$(JEST) \
 		--config=$(JEST_CONFIG) \
-		--test-match '**/test/**/*.test.mjs' \
 		$(TEST) 2>&1 \
 		| tee -a $(TEST_REPORT); \
 		touch $(TEST_PASS_MARKER) )

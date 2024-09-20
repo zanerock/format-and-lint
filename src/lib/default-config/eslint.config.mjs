@@ -23,6 +23,8 @@ import { fixupPluginRules } from "@eslint/compat"
 import stylistic from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
+import { allExts, allExtsStr, jsxExtsStr, stdExtsStr } from './js-extensions'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const babelConfigPathInstalled = join(__dirname, 'babel', 'babel.config.cjs')
@@ -255,7 +257,7 @@ delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with 
 delete rules['space-before-function-paren'] // we override default and redundant anyway
 delete rules['@stylistic/indent-binary-ops'] // this is handled better by prettier
 
-const allFiles = ['**/*.{cjs,js,jsx,mjs}']
+const allFiles = [`**/*{${allExtsStr}}`]
 
 const defaultBaseConfig = {
   files: allFiles,
@@ -289,7 +291,7 @@ if (engines?.node !== undefined) {
       'node/no-missing-import'                 : [
         'error',
         {
-          tryExtensions : ['.js', '.cjs', '.mjs', '.jsx'],
+          tryExtensions : allExts,
         },
       ],
     },
@@ -298,7 +300,7 @@ if (engines?.node !== undefined) {
 
 const defaultJsdocConfig = {
   files: allFiles,
-  ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
+  ignores : [`**/index{${stdExtsStr}}`, '**/__tests__/**/*', '**/*.test.*'],
   plugins : { jsdoc : jsdocPlugin },
   rules   : {
     ...jsdocPlugin.configs['flat/recommended-error'].rules,
@@ -311,30 +313,30 @@ const defaultJsdocConfig = {
 }
 
 const defaultJsxConfig = {
-  files           : ['**/*.jsx'],
+  files           : [`**/*{${jsxExtsStr}}`],
   // add necessary globals when processing JSX files
   languageOptions : { globals : globalsPkg.browser },
 }
 
 const defaultTestsConfig = {
-  files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
+  files           : ['**/_tests_/**', `**/*.test{${allExtsStr}}`],
   // adds correct globals when processing jest tests
   languageOptions : { globals : globalsPkg.jest },
 }
 
 const getEslintConfig = ({
-  additionalConfig = {},
-  baseConfig = defaultBaseConfig, 
-  jsdocConfig = defaultJsdocConfig, 
-  jsxConfig = defaultJsxConfig, 
-  testsConfig = defaultTestsConfig,
+  additional = {},
+  base = defaultBaseConfig, 
+  jsdoc = defaultJsdocConfig, 
+  jsx = defaultJsxConfig, 
+  tests = defaultTestsConfig,
 } = {}) => {
   const eslintConfig = [
-    baseConfig,
-    jsdocConfig,
-    jsxConfig,
-    testsConfig,
-    additionalConfig,
+    base,
+    jsdoc,
+    jsx,
+    tests,
+    additional,
   ]
 
   return eslintConfig
