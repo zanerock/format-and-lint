@@ -1,28 +1,29 @@
 import { readFile } from 'node:fs/promises'
 
-const processGitignore = async () => {
+import gitIgnoreToGlob from 'gitignore-to-glob'
+import { CommonError } from 'standard-error-set'
+
+const processGitignore = async ({ path = '.gitignore', warnOnNotIgnore }) => {
   try {
-    const gitignoreContents = await readFile('.gitignore', { encoding: 'utf8' })
-
-    const ignorePatterns = []
-    const gitignoreLines = gitignoreContents.split(/\r?\n/)
-    for (const gitIgnore of gitignoreLines) {
-      if (gitIgnore.trim() === '') continue
-
-      let newIgnore
-      if (gitIgnore.startsWith('/')) {
-        newIgnore = gitIgnore.slice(1)
+    const patterns = gitIgnoreToGlob(path)
+    const checkNotIgnore = warnOnNotIgnore === true
+      ? (pattern) => { 
+        if (pattern.charAt(0) !== '!') {
+          process.stderr.write(`Negated '.gitignore' pattern '${pattern}' will be ignored.`)
+        }
       }
-      else {
-        newIgnore = '**/' + gitIgnore
+      : (pattern) => {
+        if (pattern.charAt(0) !== '!') {
+          throw new CommonError({ // TODO: Use ConditionsNotMetError when implemented
+            message: `'.gitignore' contains un-usable negative ignore pattern. These patterns are ignored.`,
+            hint: "Rewrite the '.gitignore' patterns to factor out the negative patterns."
+          })
+        }
       }
-      if (!newIgnore.endsWith('/')) {
-        newIgnore += '/'
-      }
-      newIgnore += '**'
-
-      ignorePatterns.push(newIgnore)
-    }
+    patterns.some(checkNotIgnore)
+    // we process these patters as ignore patterns, so we remove the '!', which flips the semantics
+    const ignorePatterns = patterns.filter((p) => p.charAt(0) === '!')
+      .map((p) => p.slice(1))
 
     return ignorePatterns
   }

@@ -13,7 +13,6 @@ setReadFileResults(`src2/*.mjs
 # foo
   
 src/**/*.mjs
-
 `)
 
 export { setReadFileResults }

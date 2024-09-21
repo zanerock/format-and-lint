@@ -35,7 +35,7 @@ $(BIN_DIST): $(DIST)/%: $(BIN_SRC)/%
 	cp $< $@
 	chmod a+x $@
 
-JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' npx jest
+JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' NODE_NO_WARNINGS=1 npx jest
 JEST_CONFIG:=$(shell npm explore @liquid-labs/sdlc-resource-jest -- pwd)/dist/jest.config.js
 TEST_REPORT:=$(QA)/unit-test.txt
 TEST_PASS_MARKER:=$(QA)/.unit-test.passed

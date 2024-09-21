@@ -2,7 +2,7 @@ import './mock-read-file'
 
 describe('extractPatternsFromFile', () => {
   let extractPatternsFromFile
-  beforeEach(async () => {
+  beforeAll(async () => {
     ({ extractPatternsFromFile } = await import('../extract-patterns-from-file'))
   })
 

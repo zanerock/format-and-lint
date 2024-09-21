@@ -2,7 +2,7 @@ import './mock-read-file'
 
 describe('process-file-patterns', () => {
   let processFilePatterns
-  beforeEach(async () => {
+  beforeAll(async () => {
     ({ processFilePatterns } = await import('../process-file-patterns'))
   })
 

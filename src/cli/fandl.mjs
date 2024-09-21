@@ -64,7 +64,7 @@ const fandl = async () => {
     const ignorePatterns = processFilePaterns(ignoreFiles, ignoreFilesPaths)
     if (noStandardIgnores !== true) {
       ignorePatterns.push(...standardIgnores)
-      ignorePatterns.push(...(await processGitignore()))
+      ignorePatterns.push(...(await processGitignore({ warnOnNotIgnore: true })))
     }
     if (options.ignorePackageSettings !== true) {
       ignorePatterns.push(...(await processPackageIgnores()))
