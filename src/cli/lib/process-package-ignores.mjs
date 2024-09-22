@@ -6,3 +6,5 @@ const processPackageIgnores = async () => {
 
   return packageJSON.devPkg?.linting?.ignores || []
 }
+
+export { processPackageIgnores }
