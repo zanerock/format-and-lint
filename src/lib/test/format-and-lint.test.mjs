@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 import { copyDirToTmp } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'
-import { getFormattedText } from '../../test/lib/get-formatted-text'
+import { getFormattedTextFor } from '../../test/lib/get-formatted-text-for'
     
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -34,7 +34,7 @@ describe('formatAndLint', () => {
 
     const results = await formatAndLint({ noWrite : true, files: [testFile] })
 
-    const formattedFileContents = await getFormattedText(testFile)
+    const formattedFileContents = await getFormattedTextFor(testFile)
 
     expect(results[0].output).toBe(formattedFileContents)
   })
@@ -51,7 +51,7 @@ describe('formatAndLint', () => {
       await formatAndLint({ files: [testFile] })
 
       const formattedFileContents = await readFile(testFile, { encoding: 'utf8' })
-      const formattedExampleConents = await getFormattedText(join(testDirSrc, 'index.mjs'))
+      const formattedExampleConents = await getFormattedTextFor(join(testDirSrc, 'index.mjs'))
 
       expect(formattedFileContents).toBe(formattedExampleConents)
     }
