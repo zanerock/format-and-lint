@@ -8,11 +8,10 @@ import { find } from 'find-plus'
 import { format as prettierFormat } from 'prettier'
 
 import { cliSpec } from './cli-spec'
-import { extractPatternFromFile } from './lib/extract-patterns-from-file'
+import { extractPatternsFromFile } from './lib/extract-patterns-from-file'
 import { allExtsStr } from '../lib/default-config/js-extensions'
 import { formatAndLint } from '../lib/format-and-lint'
 import { processConfigFile } from './lib/process-config-file'
-import { processFilePatternsFile } from './lib/process-file-patterns-file'
 import { processGitignore } from './lib/process-gitignore'
 import { processPackageIgnores } from './lib/process-package-ignores'
 
@@ -70,7 +69,7 @@ const fandl = async () => {
       ignorePatterns.push(...(await processPackageIgnores()))
     }
 
-    const filePatterns = await find({ 
+    const filePaths = await find({ 
       onlyFiles: true, 
       root: '.',
       paths: targetPatterns,
@@ -93,10 +92,11 @@ const fandl = async () => {
       check : command === 'lint',
       eslintConfig, 
       eslintComfigComponents, 
-      files : filePatterns, 
+      files : filePaths, 
       prettierConfig, 
       ...remainderOptions
     })
   }
 }
 
+export { fandl }

@@ -1,5 +1,3 @@
-import { BooleanString } from 'string-input'
-
 const lintArgs = [
   { name: 'files', multiple: true, description: "A file patterns selecting target files to process. If neither this nor '--files-paths' is specified, then standard, predefined patterns will be used." },
   { name: 'files-paths', multiple: true, description: "A path to a file containing newline separated file patterns selecting files to process. If neither this nor '--files' is specified, then standard, predefined patterns will be used."},
@@ -23,9 +21,18 @@ const cliSpec = {
       description: 'Formats and runs lint checks on the target files.',
       arguments: [
         ...lintArgs,
+        {
+          name: 'output-dir',
+          alias: 'o',
+          description: "The directory to output the formatted files. This suppresses the default behavior of updating files in place. Output files will be placed relative to the source file and the effective source stem. See '--relative-stem' for details. If for whatever reason there is a name collision, the process will exit in error.'
+        },
         { 
           name: 'prettier-config-path',
           description: 'Specifies the path to a prettier configuration file to replace the default configuration as the base prettier configuration.'
+        },
+        {
+          name: 'relative-stem',
+          description: "The relative stem determines the relative placement of output files when sending output to '--output-dir' (as opposed to the default 'update in place' behavior). E.g., Given input '/usr/foo/project/src/bar/baz.mjs', '--output-dir /tmp/foo', and '--relative-stem /usr/foo/project/src/', the output file will be written to '/tmp/foo/bar/baz.mjs'. By default, the relative stem is the working directory of the process, which can be changed/set manually with this option.",
         }
       ]
     },

@@ -12,8 +12,9 @@ const formatAndLint = async ({
   eslintConfig,
   eslintConfigComponents,
   files, 
-  prettierConfig = defaultPrettierConfig,
   noWrite = false,
+  outputDir,
+  prettierConfig = defaultPrettierConfig,
 }) => {
   if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
     throw new ArgumentInvalidError({ 
@@ -52,6 +53,7 @@ const formatAndLint = async ({
     const formattedText = lintResults[0].output
 
     if (check !== true && noWrite !== true && formattedText !== undefined) {
+      console.log('file:', file) // DEBUG
       await writeFile(file, formattedText, { encoding: 'utf8' })
     }
 

@@ -12,13 +12,9 @@ ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js" -o -name "*.cjs" -o -name "*.
 
 BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.config.cjs
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
-# BABEL_CONFIG_SRC:=$(BABEL_PKG)/dist/babel/babel-shared.config.cjs $(BABEL_PKG)/dist/babel/babel.config.cjs
 
-CONFIG_FILES_SRC:=$(LIB_SRC)/eslint.config.mjs
-CONFIG_FILES_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(CONFIG_FILES_SRC))
-
-# BIN_SRC_FILES:=$(LIB_SRC)/fandl.sh
-# BIN_DIST:=$(patsubst $(LIB_SRC)/%, $(DIST)/%, $(BIN_SRC_FILES))
+ROLLUP:=npx rollup
+ROLLUP_CONFIG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)/dist/rollup/rollup.config.mjs
 
 default: all
 
@@ -30,9 +26,15 @@ $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 	mkdir -p $(dir $@)
 	cp $< $@
 
-$(BIN_DIST): $(DIST)/%: $(BIN_SRC)/%
-	mkdir -p $(dir $@)
-	cp $< $@
+FANDL_EXEC:=$(DIST)/fandl-exec.js
+FANDL_EXEC_ENTRY:=$(SRC)/cli/index.mjs
+
+$(FANDL_EXEC): package.json $(ALL_JS_FILES_SRC)
+	JS_BUILD_TARGET=$(FANDL_EXEC_ENTRY) \
+		JS_OUT=$@ \
+		JS_FORMAT=cjs \
+		JS_OUT_PREAMBLE='#!/usr/bin/env -S node --enable-source-maps' \
+	  $(ROLLUP) --config $(ROLLUP_CONFIG)
 	chmod a+x $@
 
 JEST:=NODE_OPTIONS='$(NODE_OPTIONS) --experimental-vm-modules' NODE_NO_WARNINGS=1 npx jest
@@ -43,7 +45,7 @@ COVERAGE_REPORTS:=$(QA)/coverage
 BUILD_TARGETS:=$(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST) $(BIN_DIST)
 PRECIOUS_TARGETS+=$(TEST_REPORT)
 
-$(TEST_REPORT) $(TEST_PASS_MARKER) $(COVERAGE_REPORTS) &: package.json $(ALL_JS_FILES_SRC) # $(BUILD_TARGETS)
+$(TEST_REPORT) $(TEST_PASS_MARKER) $(COVERAGE_REPORTS) &: package.json $(ALL_JS_FILES_SRC) $(FANDL_EXEC)
 	mkdir -p $(dir $@)
 	echo -n 'Test git rev: ' > $(TEST_REPORT)
 	git rev-parse HEAD >> $(TEST_REPORT)
@@ -82,7 +84,7 @@ lint: $(LINT_REPORT) $(LINT_PASS_MARKER)
 
 qa: test lint
 
-build: $(CONFIG_FILES_DIST) $(BABEL_CONFIG_DIST) $(BIN_DIST)
+build: $(BABEL_CONFIG_DIST) $(FANDL_EXEC)
 
 all: build
 
