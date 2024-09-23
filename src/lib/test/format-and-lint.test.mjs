@@ -1,16 +1,14 @@
 /**
  * @file Tests the config works as expected based on a sampling of rules.
  */
-import { copyFile, mkdtemp, readFile, rm } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { readFile, rm } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { copyDirToTmp } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'
     
 const __dirname = dirname(fileURLToPath(import.meta.url))
-
-const appKey = 'format-and-lint'
 
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
@@ -44,18 +42,15 @@ describe('formatAndLint', () => {
   })
 
   test('will update files in place', async () => {
-    const tmpDirPrefix = join(tmpdir(), `${appKey}-`)
+    const testDirSrc = resolve(__dirname, 'data', 'boolean-ops')
     let tmpDir
+
     try {
-      tmpDir = await mkdtemp(tmpDirPrefix)
-      const testFile = join(tmpDir, 'index.mjs')
-
-      const testDirSrc = resolve(__dirname, 'data', 'boolean-ops')
-      const testFileSrc = resolve(testDirSrc, 'index.mjs')
-
-      await copyFile(testFileSrc, testFile)
+      tmpDir = await copyDirToTmp(testDirSrc, { excludePaths: ['**/*.txt'] })
 
       const formattedExample = resolve(testDirSrc, 'formatted.txt')
+
+      const testFile = join(tmpDir, 'index.mjs')
 
       await formatAndLint({ files: [testFile] })
 

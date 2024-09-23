@@ -1,4 +1,4 @@
-// Note: tests against built exec because, why not?
+import { fandl } from '../fandl'
 
 describe('fandl', () => {
   
