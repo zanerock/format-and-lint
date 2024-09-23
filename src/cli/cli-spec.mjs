@@ -24,7 +24,7 @@ const cliSpec = {
         {
           name: 'output-dir',
           alias: 'o',
-          description: "The directory to output the formatted files. This suppresses the default behavior of updating files in place. Output files will be placed relative to the source file and the effective source stem. See '--relative-stem' for details. If for whatever reason there is a name collision, the process will exit in error.'
+          description: "The directory to output the formatted files. This suppresses the default behavior of updating files in place. Output files will be placed relative to the source file and the effective source stem. See '--relative-stem' for details. If for whatever reason there is a name collision, the process will exit in error."
         },
         { 
           name: 'prettier-config-path',
@@ -32,7 +32,7 @@ const cliSpec = {
         },
         {
           name: 'relative-stem',
-          description: "The relative stem determines the relative placement of output files when sending output to '--output-dir' (as opposed to the default 'update in place' behavior). E.g., Given input '/usr/foo/project/src/bar/baz.mjs', '--output-dir /tmp/foo', and '--relative-stem /usr/foo/project/src/', the output file will be written to '/tmp/foo/bar/baz.mjs'. By default, the relative stem is the working directory of the process, which can be changed/set manually with this option.",
+          description: "The relative stem determines the relative placement of output files when sending output to '--output-dir' (as opposed to the default 'update in place' behavior). E.g., Given input '/usr/foo/project/src/bar/baz.mjs', '--output-dir /tmp/foo', and '--relative-stem /usr/foo/project/src/', the output file will be written to '/tmp/foo/bar/baz.mjs'. By default, the relative stem is the working directory of the process, which can be changed/set manually with this option. If any resolved input file path does not start with the effective effective source stem, the process will exit with an error.",
         }
       ]
     },

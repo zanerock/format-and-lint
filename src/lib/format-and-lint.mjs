@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises'
+import * as path from 'node:path'
 
 import { ESLint } from 'eslint'
 import { format as prettierFormat } from 'prettier'
@@ -15,6 +16,7 @@ const formatAndLint = async ({
   noWrite = false,
   outputDir,
   prettierConfig = defaultPrettierConfig,
+  relativeStem = process.cwd(),
 }) => {
   if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
     throw new ArgumentInvalidError({ 
@@ -53,8 +55,23 @@ const formatAndLint = async ({
     const formattedText = lintResults[0].output
 
     if (check !== true && noWrite !== true && formattedText !== undefined) {
-      console.log('file:', file) // DEBUG
-      await writeFile(file, formattedText, { encoding: 'utf8' })
+      let outputPath = file
+      if (outputDir !== undefined) {
+        if (!file.startsWith(outputPath)) {
+          throw new ArgumentInvalidError({ 
+            message: `Resolved input file path '${file}' does not start with effective source stem '${relativeStem}'.`,
+            hint: "Check input file paths/selection patterns and set or harmonize '--relative-stem' option if necessary.",
+          })
+        }
+
+        let relPath = file.slice(relativeStem.length)
+        if (relPath.startsWith(path.sep)) {
+          relPath = relPath.slice(1)
+        }
+        outputPath = path.join(relativeStem, relPath)
+      }
+      
+      await writeFile(outputPath, formattedText, { encoding: 'utf8' })
     }
 
     return lintResults
