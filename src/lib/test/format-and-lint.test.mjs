@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 import { copyDirToTmp } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'
+import { getFormattedText } from '../../test/lib/get-formatted-text'
     
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -30,13 +31,10 @@ describe('formatAndLint', () => {
   test.each(formatTests)('%s', async (description, testDir) => {
     testDir = resolve(__dirname, 'data', testDir)
     const testFile = resolve(testDir, 'index.mjs')
-    const formattedFile = resolve(testDir, 'formatted.txt')
 
     const results = await formatAndLint({ noWrite : true, files: [testFile] })
 
-    const formattedFileContents = await readFile(formattedFile, {
-      encoding : 'utf8',
-    })
+    const formattedFileContents = await getFormattedText(testFile)
 
     expect(results[0].output).toBe(formattedFileContents)
   })
@@ -48,16 +46,12 @@ describe('formatAndLint', () => {
     try {
       tmpDir = await copyDirToTmp(testDirSrc, { excludePaths: ['**/*.txt'] })
 
-      const formattedExample = resolve(testDirSrc, 'formatted.txt')
-
       const testFile = join(tmpDir, 'index.mjs')
 
       await formatAndLint({ files: [testFile] })
 
-      const formattedExampleConents = await readFile(formattedExample, {
-        encoding : 'utf8',
-      })
       const formattedFileContents = await readFile(testFile, { encoding: 'utf8' })
+      const formattedExampleConents = await getFormattedText(join(testDirSrc, 'index.mjs'))
 
       expect(formattedFileContents).toBe(formattedExampleConents)
     }
