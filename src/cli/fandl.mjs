@@ -20,8 +20,8 @@ const standardIgnores = ['**/test/data/**/*', 'doc/**', 'dist/**']
 const prettierBin = 'npx prettier'
 const eslintBin = 'npx eslint'
 
-const fandl = async () => {
-  const options = commandLineArgs(cliSpec, { camelCase: true, partial: true })
+const fandl = async ({ argv = process.argv }) => {
+  const options = commandLineArgs(cliSpec, { aprv, camelCase: true, partial: true })
   const command = options.command || 'format-and-lint'
 
   if (command === 'format-and-lint' || command === 'lint') {
@@ -43,38 +43,7 @@ const fandl = async () => {
       })
     }
 
-    // process files
-    const targetPatterns = processFilePatterns(files, filesPaths)
-    if (targetPatterns.length === 0) {
-      const rootSrcIndicatorFiles = ['index.js', 'index.mjs', 'index.cjs']
-      if (rootSrcIndicatorFiles.some((f) => existsSync(join('.', f)))) {
-        targetPatterns = [`**/*${allExtsStr}`]
-      }
-      else if (existsSrc(join('.', 'src'))) {
-        targetPatterns = [`src/**/*${allExtsStr}`]
-      }
-      else {
-        throw new ArgumentInvalidError({
-          message: "Did not find root index nor src directory; specify '--files' or '--files-paths'."
-        })
-      }
-    }
-
-    const ignorePatterns = processFilePaterns(ignoreFiles, ignoreFilesPaths)
-    if (noStandardIgnores !== true) {
-      ignorePatterns.push(...standardIgnores)
-      ignorePatterns.push(...(await processGitignore({ warnOnNotIgnore: true })))
-    }
-    if (options.ignorePackageSettings !== true) {
-      ignorePatterns.push(...(await processPackageIgnores()))
-    }
-
-    const filePaths = await find({ 
-      onlyFiles: true, 
-      root: '.',
-      paths: targetPatterns,
-      excludePaths: ignorePatterns
-    })
+    const filePaths = selectFilesFromArgs(options)
 
     const eslintConfig = eslintConfigPath === undefined
       ? undefined
