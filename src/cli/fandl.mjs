@@ -4,18 +4,11 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import commandLineArgs from 'command-line-args'
-import { find } from 'find-plus'
 import { format as prettierFormat } from 'prettier'
 
 import { cliSpec } from './cli-spec'
-import { extractPatternsFromFile } from './lib/extract-patterns-from-file'
-import { allExtsStr } from '../lib/default-config/js-extensions'
 import { formatAndLint } from '../lib/format-and-lint'
 import { processConfigFile } from './lib/process-config-file'
-import { processGitignore } from './lib/process-gitignore'
-import { processPackageIgnores } from './lib/process-package-ignores'
-
-const standardIgnores = ['**/test/data/**/*', 'doc/**', 'dist/**']
 
 const prettierBin = 'npx prettier'
 const eslintBin = 'npx eslint'
