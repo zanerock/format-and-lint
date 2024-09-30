@@ -7,6 +7,7 @@ const lintArgs = [
   { name: 'eslint-config-components-path', description: "Specifies the path to a configuration file that resolves to an object keyed to 'base', 'jsx', 'node', and 'test' configuration components." },
   { name: 'ignore-package-settings', type: Boolean, description: "Suppresses merging settings from 'package.json:devPkg.linting'."},
   { name: 'no-standard-ignores', type: Boolean, description: "Suppresses default .gitignore and '**/test/data/**/*' ignore patterns." },
+  { name: 'root', description: 'The directory from which to start looking for files.' },
 ]
 
 const cliSpec = {
@@ -14,6 +15,7 @@ const cliSpec = {
   description: 'Optimized, single command out of the box JavaScript format and lint tool.',
   arguments: [
     { name: 'command', defaultOption: true, default: 'format-and-lint', description: 'The action to perform.' },
+    ...lintArgs,
   ],
   commands: [
     { 

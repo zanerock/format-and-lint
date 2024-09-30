@@ -3,13 +3,13 @@
  */
 import { readFile, rm } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import { copyDirToTmp } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'
 import { getFormattedTextFor } from '../../test/lib/get-formatted-text-for'
+import { myDirFromImport } from '../../test/lib/my-dir-from-import'
     
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = myDirFromImport(import.meta.url)
 
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {

@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 
 import { find } from 'find-plus'
 
@@ -16,7 +16,9 @@ const selectFilesFromOptions = async ({
   ignoreFiles, 
   ignoreFilesPaths, 
   ignorePackageSettings, 
-  noStandardIgnores
+  noStandardIgnores,
+  // root = '.', //process.cwd(),
+  root = process.cwd(),
 }) => {
   const targetPatterns = await processFilePatterns(files, filesPaths)
   if (targetPatterns.length === 0) {
@@ -45,7 +47,7 @@ const selectFilesFromOptions = async ({
 
   return await find({ 
     onlyFiles: true, 
-    root: '.',
+    root,
     paths: targetPatterns,
     excludePaths: ignorePatterns
   })
