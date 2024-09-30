@@ -31,4 +31,14 @@ describe('fandl', () => {
       }
     }
   })
+
+  test("raises error if both '--eslint-config-path' and '--eslint-config-components-path' are specified", async () => {
+    try {
+      await fandl({ argv: ['--eslint-config-path', '/foo', '--eslint-config-components-path', '/foo']})
+      throw new Error('Did not throw error as expected.')
+    }
+    catch (e) {
+      expect(e.message).toMatch(/^Specifying both '--eslint-config-path'/)
+    }
+  })
 })

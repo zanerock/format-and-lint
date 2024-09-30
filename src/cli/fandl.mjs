@@ -4,6 +4,7 @@ import { join } from 'node:path'
 
 import commandLineArgs from 'command-line-args'
 import { format as prettierFormat } from 'prettier'
+import { ArgumentInvalidError } from 'standard-error-set'
 
 import { cliSpec } from './cli-spec'
 import { formatAndLint } from '../lib/format-and-lint'
@@ -13,7 +14,7 @@ import { selectFilesFromOptions } from '../lib/lib/select-files-from-options'
 const prettierBin = 'npx prettier'
 const eslintBin = 'npx eslint'
 
-const fandl = async ({ argv = process.argv }) => {
+const fandl = async ({ argv = process.argv } = {}) => {
   const mainOpts = commandLineArgs(cliSpec.arguments, { argv, camelCase: true, partial: true })
   const command = mainOpts.command || 'format-and-lint'
 
@@ -25,8 +26,8 @@ const fandl = async ({ argv = process.argv }) => {
         mainOpts, 
         commandLineArgs(
           cliSpec.commands.find((c) => c.name === command).arguments, 
-          { argv: mainOpts._unknown, camelCase: true 
-        }))
+          { argv: mainOpts._unknown, camelCase: true }
+        ))
 
     const { 
       files, 

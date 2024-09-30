@@ -70,13 +70,13 @@ $(LINT_REPORT) $(LINT_PASS_MARKER) &: $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
 	echo -n 'Test git rev: ' > $(LINT_REPORT)
 	git rev-parse HEAD >> $(LINT_REPORT)
 	( set -e; set -o pipefail; \
-		$(FANDL) --check \
+		$(FANDL_EXEC) lint \
 	    | tee -a $(LINT_REPORT); \
 	  touch $(LINT_PASS_MARKER) )
 
 lint-fix: $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
 	@( set -e; set -o pipefail; \
-	  $(FANDL) )
+	  $(FANDL_EXEC) )
 
 test: $(TEST_REPORT) $(TEST_PASS_MARKER)
 
