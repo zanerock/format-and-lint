@@ -23,7 +23,7 @@ import { fixupPluginRules } from "@eslint/compat"
 import stylistic from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
-import { allExts, allExtsStr, jsxExtsStr, stdExtsStr } from './js-extensions'
+import { allExts, allExtsStr, jsxExtsStr } from './js-extensions'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -300,7 +300,7 @@ if (engines?.node !== undefined) {
 
 const defaultJsdocConfig = {
   files: allFiles,
-  ignores : [`**/index{${stdExtsStr}}`, '**/__tests__/**/*', '**/*.test.*'],
+  ignores : [`**/index{${allExtsStr}}`, '**/__tests__/**/*', '**/*.test.*'],
   plugins : { jsdoc : jsdocPlugin },
   rules   : {
     ...jsdocPlugin.configs['flat/recommended-error'].rules,

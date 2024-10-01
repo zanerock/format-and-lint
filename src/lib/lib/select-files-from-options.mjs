@@ -3,12 +3,10 @@ import { join, resolve } from 'node:path'
 
 import { find } from 'find-plus'
 
-import { allExtsStr } from '../default-config/js-extensions'
+import { allExts } from '../default-config/js-extensions'
 import { processFilePatterns } from './process-file-patterns'
 import { processGitignore } from './process-gitignore'
 import { processPackageIgnores } from './process-package-ignores'
-
-const standardIgnores = ['**/test/data/**/*', 'doc/**', 'dist/**']
 
 const selectFilesFromOptions = async ({ 
   files, 
@@ -17,17 +15,19 @@ const selectFilesFromOptions = async ({
   ignoreFilesPaths, 
   ignorePackageSettings, 
   noStandardIgnores,
-  // root = '.', //process.cwd(),
   root = process.cwd(),
 }) => {
+  const standardIgnores = ['**/test/data/**/*', 'doc/**', 'dist/**']
+  const allExtsMatch = `@(${allExts.join('|')})`
+
   const targetPatterns = await processFilePatterns(files, filesPaths)
   if (targetPatterns.length === 0) {
     const rootSrcIndicatorFiles = ['index.js', 'index.mjs', 'index.cjs']
-    if (rootSrcIndicatorFiles.some((f) => existsSync(join('.', f)))) {
-      targetPatterns.push(`**/*${allExtsStr}`)
+    if (rootSrcIndicatorFiles.some((f) => existsSync(join(root, f)))) {
+      targetPatterns.push(`**/*${allExtsMatch}`)
     }
-    else if (existsSync(join('.', 'src'))) {
-      targetPatterns.push(`src/**/*${allExtsStr}`)
+    else if (existsSync(join(root, 'src'))) {
+      targetPatterns.push(`src/**/*${allExtsMatch}`)
     }
     else {
       throw new ArgumentInvalidError({
