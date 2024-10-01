@@ -19,7 +19,7 @@ import nodePlugin from 'eslint-plugin-node'
 import promisePlugin from 'eslint-plugin-promise'
 import nPlugin from 'eslint-plugin-n'
 import babelParser from '@babel/eslint-parser'
-import { fixupPluginRules } from "@eslint/compat"
+import { fixupPluginRules } from '@eslint/compat'
 import stylistic from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
@@ -30,11 +30,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const babelConfigPathInstalled = join(__dirname, 'babel', 'babel.config.cjs')
 const babelConfigPathTest = join('dist', 'babel', 'babel.config.cjs')
 
-const babelConfigPath = existsSync(babelConfigPathInstalled) === true
-  ? babelConfigPathInstalled
-  : existsSync(babelConfigPathTest)
-    ? babelConfigPathTest
-    : undefined
+const babelConfigPath =
+  existsSync(babelConfigPathInstalled) === true
+    ? babelConfigPathInstalled
+    : existsSync(babelConfigPathTest)
+      ? babelConfigPathTest
+      : undefined
 if (babelConfigPath === undefined) {
   throw new Error('Could not find babel config file.')
 }
@@ -260,7 +261,7 @@ delete rules['@stylistic/indent-binary-ops'] // this is handled better by pretti
 const allFiles = [`**/*{${allExtsStr}}`]
 
 const defaultBaseConfig = {
-  files: allFiles,
+  files           : allFiles,
   languageOptions : {
     parser        : babelParser,
     parserOptions : {
@@ -282,24 +283,22 @@ if (engines?.node !== undefined) {
   defaultBaseConfig.plugins.node = fixupPluginRules(nodePlugin)
   // TODO: actually, we don't want this for MJS files... but I'm not sure what we do want
   defaultBaseConfig.languageOptions.globals = globalsPkg.node
-  Object.assign(defaultBaseConfig.rules,
-    {
-      ...nodePlugin.configs.recommended.rules,
-      'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
-      'node/prefer-promises/dns'               : 'error',
-      'node/prefer-promises/fs'                : 'error',
-      'node/no-missing-import'                 : [
-        'error',
-        {
-          tryExtensions : allExts,
-        },
-      ],
-    },
-  )
+  Object.assign(defaultBaseConfig.rules, {
+    ...nodePlugin.configs.recommended.rules,
+    'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
+    'node/prefer-promises/dns'               : 'error',
+    'node/prefer-promises/fs'                : 'error',
+    'node/no-missing-import'                 : [
+      'error',
+      {
+        tryExtensions : allExts,
+      },
+    ],
+  })
 }
 
 const defaultJsdocConfig = {
-  files: allFiles,
+  files   : allFiles,
   ignores : [`**/index{${allExtsStr}}`, '**/__tests__/**/*', '**/*.test.*'],
   plugins : { jsdoc : jsdocPlugin },
   rules   : {
@@ -326,18 +325,12 @@ const defaultTestsConfig = {
 
 const getEslintConfig = ({
   additional = {},
-  base = defaultBaseConfig, 
-  jsdoc = defaultJsdocConfig, 
-  jsx = defaultJsxConfig, 
+  base = defaultBaseConfig,
+  jsdoc = defaultJsdocConfig,
+  jsx = defaultJsxConfig,
   tests = defaultTestsConfig,
 } = {}) => {
-  const eslintConfig = [
-    base,
-    jsdoc,
-    jsx,
-    tests,
-    additional,
-  ]
+  const eslintConfig = [base, jsdoc, jsx, tests, additional]
 
   return eslintConfig
 }

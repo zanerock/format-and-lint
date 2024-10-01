@@ -5,8 +5,9 @@ import { getEslintConfig } from '../default-config/eslint.config'
 
 const getEslint = ({ eslintConfig, eslintConfigComponents }) => {
   if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
-    throw new ArgumentInvalidError({ 
-      message: "You cannot define 'eslintConfig' and 'eslintConfigComponents' simultaneously.",
+    throw new ArgumentInvalidError({
+      message :
+        "You cannot define 'eslintConfig' and 'eslintConfigComponents' simultaneously.",
     })
   }
 
@@ -15,10 +16,10 @@ const getEslint = ({ eslintConfig, eslintConfigComponents }) => {
   }
 
   return new ESLint({
-    fix : true,
+    fix                : true,
     // this keeps eslint from insisting on an eslint config file
     overrideConfigFile : true,
-    baseConfig: eslintConfig,
+    baseConfig         : eslintConfig,
   })
 }
 

@@ -8,12 +8,12 @@ import { copyDirToTmp, getTmpDir } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'
 import { getFormattedTextFor } from '../../test/lib/get-formatted-text-for'
 import { myDirFromImport } from '../../test/lib/my-dir-from-import'
-    
+
 const __dirname = myDirFromImport(import.meta.url)
 
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
-    const args = { check : true, eslintConfig : [], eslintConfigComponents: [] }
+    const args = { check : true, eslintConfig : [], eslintConfigComponents : [] }
     try {
       // expect(() => formatAndLint(args)).toThrow(/You cannot define/)
       await formatAndLint(args)
@@ -33,7 +33,7 @@ describe('formatAndLint', () => {
     testDir = resolve(__dirname, 'data', testDir)
     const testFile = resolve(testDir, 'index.mjs')
 
-    const results = await formatAndLint({ noWrite : true, files: [testFile] })
+    const results = await formatAndLint({ noWrite : true, files : [testFile] })
 
     const formattedFileContents = await getFormattedTextFor(testFile)
 
@@ -45,20 +45,24 @@ describe('formatAndLint', () => {
     let tmpDir
 
     try {
-      tmpDir = await copyDirToTmp(testDirSrc, { excludePaths: ['**/*.txt'] })
+      tmpDir = await copyDirToTmp(testDirSrc, { excludePaths : ['**/*.txt'] })
 
       const testFile = join(tmpDir, 'index.mjs')
 
-      await formatAndLint({ files: [testFile] })
+      await formatAndLint({ files : [testFile] })
 
-      const formattedFileContents = await readFile(testFile, { encoding: 'utf8' })
-      const formattedExampleConents = await getFormattedTextFor(join(testDirSrc, 'index.mjs'))
+      const formattedFileContents = await readFile(testFile, {
+        encoding : 'utf8',
+      })
+      const formattedExampleConents = await getFormattedTextFor(
+        join(testDirSrc, 'index.mjs')
+      )
 
       expect(formattedFileContents).toBe(formattedExampleConents)
     }
     finally {
       if (tmpDir !== undefined) {
-        await rm(tmpDir, { recursive: true })
+        await rm(tmpDir, { recursive : true })
       }
     }
   })
@@ -69,9 +73,15 @@ describe('formatAndLint', () => {
     const srcFile = join(srcRoot, 'index.mjs')
     const formattedExampleConents = await getFormattedTextFor(srcFile)
     try {
-      await formatAndLint({ files: [srcFile], outputDir : tmpDir, relativeStem: srcRoot })
+      await formatAndLint({
+        files        : [srcFile],
+        outputDir    : tmpDir,
+        relativeStem : srcRoot,
+      })
       const formattedFile = join(tmpDir, 'index.mjs')
-      const formattedFileContents = await readFile(formattedFile, { encoding: 'utf8' })
+      const formattedFileContents = await readFile(formattedFile, {
+        encoding : 'utf8',
+      })
 
       expect(formattedFileContents).toBe(formattedExampleConents)
     }

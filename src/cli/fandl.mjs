@@ -16,70 +16,83 @@ const prettierBin = 'npx prettier'
 const eslintBin = 'npx eslint'
 
 const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
-  const mainOpts = commandLineArgs(cliSpec.arguments, { argv, camelCase: true, partial: true })
+  const mainOpts = commandLineArgs(cliSpec.arguments, {
+    argv,
+    camelCase : true,
+    partial   : true,
+  })
   const command = mainOpts.command || 'format-and-lint'
 
   if (command === 'format-and-lint' || command === 'lint') {
-    const options = mainOpts._unknown === undefined
-      ? mainOpts
-      : Object.assign(
-        {}, 
-        mainOpts, 
-        commandLineArgs(
-          cliSpec.commands.find((c) => c.name === command).arguments, 
-          { argv: mainOpts._unknown, camelCase: true }
-        ))
+    const options =
+      mainOpts._unknown === undefined
+        ? mainOpts
+        : Object.assign(
+          {},
+          mainOpts,
+          commandLineArgs(
+            cliSpec.commands.find((c) => c.name === command).arguments,
+            { argv : mainOpts._unknown, camelCase : true }
+          )
+        )
 
-    const { 
-      files, 
-      filesPaths, 
-      eslintConfigPath, 
-      eslintConfigComponentsPath, 
-      ignoreFiles, 
-      ignoreFilesPaths, 
-      noStandardIgnores, 
+    const {
+      files,
+      filesPaths,
+      eslintConfigPath,
+      eslintConfigComponentsPath,
+      ignoreFiles,
+      ignoreFilesPaths,
+      noStandardIgnores,
       prettierConfigPath,
       ...remainderOptions
     } = options
 
-    if (eslintConfigPath !== undefined && eslintConfigComponentsPath !== undefined) {
-      throw new ArgumentInvalidError({ 
-        message: "Specifying both '--eslint-config-path' and '--eslint-config-components-path' is invalid. Please specify one or the other."
+    if (
+      eslintConfigPath !== undefined
+      && eslintConfigComponentsPath !== undefined
+    ) {
+      throw new ArgumentInvalidError({
+        message :
+          "Specifying both '--eslint-config-path' and '--eslint-config-components-path' is invalid. Please specify one or the other.",
       })
     }
 
     const filePaths = await selectFilesFromOptions(options)
 
-    const eslintConfig = eslintConfigPath === undefined
-      ? undefined
-      : await processConfigFile(eslintConfigPath)
-  
-    const eslintComfigComponents = eslintConfigComponentsPath === undefined
-      ? undefined
-      : await processConfigFile(eslintConfigComponentsPath)
+    const eslintConfig =
+      eslintConfigPath === undefined
+        ? undefined
+        : await processConfigFile(eslintConfigPath)
 
-    const prettierConfig = prettierConfigPath === undefined
-      ? undefined
-      : await processConfigFile(prettierConfigPath)
+    const eslintComfigComponents =
+      eslintConfigComponentsPath === undefined
+        ? undefined
+        : await processConfigFile(eslintConfigComponentsPath)
+
+    const prettierConfig =
+      prettierConfigPath === undefined
+        ? undefined
+        : await processConfigFile(prettierConfigPath)
 
     const eslint = getEslint({ eslintConfig, eslintComfigComponents })
 
     const results = await formatAndLint({
       check : command === 'lint',
       eslint,
-      files : filePaths, 
-      prettierConfig, 
-      ...remainderOptions
+      files : filePaths,
+      prettierConfig,
+      ...remainderOptions,
     })
 
     // TODO: The formatter internally uses 'chalk', which auto-detects color based on:
     // 1) '--color' or '--no-color' options on process.argv
     // 2) FORCE_COLOR env var
     // 3) output stream type
-    // In the code, it does not look to me like 'formatter.format' actually cares about the fact that it's going to 
+    // In the code, it does not look to me like 'formatter.format' actually cares about the fact that it's going to
     // text and may apply these rules regardless. Needs further investigation.
     // process.env.FORCE_COLOR=2
-    const formatter = await eslint.loadFormatter("stylish")
+    const formatter = await eslint.loadFormatter('stylish')
     const resultText = formatter.format(results)
 
     stdout.write(resultText)

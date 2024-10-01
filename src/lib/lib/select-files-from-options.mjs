@@ -9,12 +9,12 @@ import { processFilePatterns } from './process-file-patterns'
 import { processGitignore } from './process-gitignore'
 import { processPackageIgnores } from './process-package-ignores'
 
-const selectFilesFromOptions = async ({ 
-  files, 
-  filesPaths, 
-  ignoreFiles, 
-  ignoreFilesPaths, 
-  ignorePackageSettings, 
+const selectFilesFromOptions = async ({
+  files,
+  filesPaths,
+  ignoreFiles,
+  ignoreFilesPaths,
+  ignorePackageSettings,
   noStandardIgnores,
   root = process.cwd(),
 }) => {
@@ -32,26 +32,30 @@ const selectFilesFromOptions = async ({
     }
     else {
       throw new ArgumentInvalidError({
-        message: "Did not find root index nor 'src' directory to indicate default matching pattern.",
-        hint: "Specify '--files' or '--files-paths'.",
+        message :
+          "Did not find root index nor 'src' directory to indicate default matching pattern.",
+        hint : "Specify '--files' or '--files-paths'.",
       })
     }
   }
 
-  const ignorePatterns = await processFilePatterns(ignoreFiles, ignoreFilesPaths)
+  const ignorePatterns = await processFilePatterns(
+    ignoreFiles,
+    ignoreFilesPaths
+  )
   if (noStandardIgnores !== true) {
     ignorePatterns.push(...standardIgnores)
-    ignorePatterns.push(...(await processGitignore({ warnOnNotIgnore: true })))
+    ignorePatterns.push(...(await processGitignore({ warnOnNotIgnore : true })))
   }
   if (ignorePackageSettings !== true) {
     ignorePatterns.push(...(await processPackageIgnores()))
   }
 
-  return await find({ 
-    onlyFiles: true, 
+  return await find({
+    onlyFiles    : true,
     root,
-    paths: targetPatterns,
-    excludePaths: ignorePatterns
+    paths        : targetPatterns,
+    excludePaths : ignorePatterns,
   })
 }
 

@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 
 const extractPatternsFromFile = async (path) => {
-  const fileContents = await readFile(path, { encoding: 'utf8' })
+  const fileContents = await readFile(path, { encoding : 'utf8' })
 
   const filePatterns = fileContents
     .split(/(?:\r)?\n/) // one pattern per line

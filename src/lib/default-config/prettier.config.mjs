@@ -1,9 +1,9 @@
 const prettierConfig = {
-  arrowParens: 'always',
-  bracketSpacing: true,
-  semi: false,
-  singleQuote: true,
-  trailingComma: 'es5',
+  arrowParens    : 'always',
+  bracketSpacing : true,
+  semi           : false,
+  singleQuote    : true,
+  trailingComma  : 'es5',
 }
 
 export { prettierConfig }
