@@ -19,8 +19,9 @@ const processGitignore = async ({ path = '.gitignore', warnOnNotIgnore }) => {
             if (pattern.charAt(0) !== '!') {
               throw new CommonError({
                 // TODO: Use ConditionsNotMetError when implemented
-                message : '\'.gitignore\' contains un-usable negative ignore pattern. These patterns are ignored.',
-                hint    : "Rewrite the '.gitignore' patterns to factor out the negative patterns.",
+                message :
+                  "'.gitignore' contains un-usable negative ignore pattern. These patterns are ignored.",
+                hint : "Rewrite the '.gitignore' patterns to factor out the negative patterns.",
               })
             }
           }

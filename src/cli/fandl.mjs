@@ -85,13 +85,13 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
       ...remainderOptions,
     })
 
-    // TODO: The formatter internally uses 'chalk', which auto-detects color based on:
+    // TODO: support '--color', '--no-color options; The formatter internally uses 'chalk', which auto-detects color 
+    // based on:
     // 1) '--color' or '--no-color' options on process.argv
     // 2) FORCE_COLOR env var
     // 3) output stream type
-    // In the code, it does not look to me like 'formatter.format' actually cares about the fact that it's going to
-    // text and may apply these rules regardless. Needs further investigation.
-    // process.env.FORCE_COLOR=2
+    // 'formatter.format'  does not actually cares about the fact that it's going to a text string and applies these 
+    // rules regardless. Needs further investigation.
     const formatter = await eslint.loadFormatter('stylish')
     const resultText = formatter.format(results)
 
