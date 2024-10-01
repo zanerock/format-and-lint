@@ -54,7 +54,7 @@ const formatAndLint = async ({
     }
     const formattedText = lintResults[0].output
 
-    if (check !== true && noWrite !== true && formattedText !== undefined) {
+    if (check !== true && noWrite !== true && (formattedText !== undefined || outputDir !== undefined)) {
       let outputPath = file
       if (outputDir !== undefined) {
         if (!file.startsWith(outputPath)) {
@@ -68,10 +68,11 @@ const formatAndLint = async ({
         if (relPath.startsWith(path.sep)) {
           relPath = relPath.slice(1)
         }
-        outputPath = path.join(relativeStem, relPath)
+        outputPath = path.join(outputDir, relPath)
       }
       
-      await writeFile(outputPath, formattedText, { encoding: 'utf8' })
+      const outputText = formattedText || prettierSource
+      await writeFile(outputPath, outputText, { encoding: 'utf8' })
     }
 
     return lintResults

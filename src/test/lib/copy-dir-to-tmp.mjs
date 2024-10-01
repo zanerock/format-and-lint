@@ -7,8 +7,7 @@ import { find } from 'find-plus'
 const appKey = 'format-and-lint'
 
 const copyDirToTmp = async (dir, findOptions) => {
-  const tmpDirPrefix = path.join(tmpdir(), `${appKey}-`)
-  const tmpDir = await fs.mkdtemp(tmpDirPrefix)
+  const tmpDir = await getTmpDir()
   
   const filesToCopy = await find({
     ...findOptions,
@@ -34,4 +33,9 @@ const copyDirToTmp = async (dir, findOptions) => {
   return tmpDir
 }
 
-export { copyDirToTmp }
+const getTmpDir = async () => {
+  const tmpDirPrefix = path.join(tmpdir(), `${appKey}-`)
+  return  await fs.mkdtemp(tmpDirPrefix)
+}
+
+export { getTmpDir, copyDirToTmp }

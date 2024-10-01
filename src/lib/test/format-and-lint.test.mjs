@@ -4,7 +4,7 @@
 import { readFile, rm } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 
-import { copyDirToTmp } from '../../test/lib/copy-dir-to-tmp'
+import { copyDirToTmp, getTmpDir } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'
 import { getFormattedTextFor } from '../../test/lib/get-formatted-text-for'
 import { myDirFromImport } from '../../test/lib/my-dir-from-import'
@@ -24,6 +24,7 @@ describe('formatAndLint', () => {
   })
 
   const formatTests = [
+    ['correctly handles prettier only formatting', 'basic-indent'],
     ['correctly formats boolean operators in if statement', 'boolean-ops'],
     ['correctly places required semicolon', 'necessary-semicolon'],
   ]
@@ -59,6 +60,23 @@ describe('formatAndLint', () => {
       if (tmpDir !== undefined) {
         await rm(tmpDir, { recursive: true })
       }
+    }
+  })
+
+  test('will write to output directory', async () => {
+    const tmpDir = await getTmpDir()
+    const srcRoot = join(__dirname, 'data', 'basic-indent')
+    const srcFile = join(srcRoot, 'index.mjs')
+    const formattedExampleConents = await getFormattedTextFor(srcFile)
+    try {
+      await formatAndLint({ files: [srcFile], outputDir : tmpDir, relativeStem: srcRoot })
+      const formattedFile = join(tmpDir, 'index.mjs')
+      const formattedFileContents = await readFile(formattedFile, { encoding: 'utf8' })
+
+      expect(formattedFileContents).toBe(formattedExampleConents)
+    }
+    finally {
+      await rm(tmpDir, { recursive : true })
     }
   })
 })
