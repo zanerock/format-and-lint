@@ -18,12 +18,16 @@ describe('fandl', () => {
 
       const testFile = join(tmpDir, 'index.mjs')
 
-      await fandl({ argv: ['--root', tmpDir, '--files', `**/*.mjs`] })
+      let output
+      const mockStdOut = { write: (msg) => { output = msg }}
+
+      await fandl({ argv: ['--root', tmpDir, '--files', `**/*.mjs`], stdout: mockStdOut })
 
       const formattedFileContents = await readFile(testFile, { encoding: 'utf8' })
       const formattedExampleConents = await getFormattedTextFor(join(testDirSrc, 'index.mjs'))
 
       expect(formattedFileContents).toBe(formattedExampleConents)
+      expect(output).toBe('')
     }
     finally {
       if (tmpDir !== undefined) {

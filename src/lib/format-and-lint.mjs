@@ -1,15 +1,15 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import * as path from 'node:path'
 
-import { ESLint } from 'eslint'
 import { format as prettierFormat } from 'prettier'
 import { ArgumentInvalidError } from 'standard-error-set'
 
-import { getEslintConfig } from './default-config/eslint.config'
+import { getEslint } from './lib/get-eslint'
 import { prettierConfig as defaultPrettierConfig } from './default-config/prettier.config'
 
 const formatAndLint = async ({
   check = false,
+  eslint,
   eslintConfig,
   eslintConfigComponents,
   files, 
@@ -18,25 +18,12 @@ const formatAndLint = async ({
   prettierConfig = defaultPrettierConfig,
   relativeStem = process.cwd(),
 }) => {
-  if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
-    throw new ArgumentInvalidError({ 
-      message: "You cannot define 'eslintConfig' and 'eslintConfigComponents' simultaneously.",
-    })
-  }
-
-  if (eslintConfig === undefined) {
-    eslintConfig = getEslintConfig(eslintConfigComponents)
+  if (eslint === undefined) {
+    eslint = getEslint({ eslintConfig, eslintConfigComponents })
   }
 
   const prettierParseConfig = structuredClone(prettierConfig)
   prettierParseConfig.parser = 'babel'
-
-  const eslint = new ESLint({
-    fix : true,
-    // this keeps eslint from insisting on an eslint config file
-    overrideConfigFile : true,
-    baseConfig: eslintConfig,
-  })
 
   const processSource = async (file) => {
     const readPromise = readFile(file, { encoding: 'utf8' })

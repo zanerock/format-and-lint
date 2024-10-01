@@ -8,13 +8,14 @@ import { ArgumentInvalidError } from 'standard-error-set'
 
 import { cliSpec } from './cli-spec'
 import { formatAndLint } from '../lib/format-and-lint'
+import { getEslint } from '../lib/lib/get-eslint'
 import { processConfigFile } from './lib/process-config-file'
 import { selectFilesFromOptions } from '../lib/lib/select-files-from-options'
 
 const prettierBin = 'npx prettier'
 const eslintBin = 'npx eslint'
 
-const fandl = async ({ argv = process.argv } = {}) => {
+const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
   const mainOpts = commandLineArgs(cliSpec.arguments, { argv, camelCase: true, partial: true })
   const command = mainOpts.command || 'format-and-lint'
 
@@ -61,14 +62,20 @@ const fandl = async ({ argv = process.argv } = {}) => {
       ? undefined
       : await processConfigFile(prettierConfigPath)
 
-    await formatAndLint({
+    const eslint = getEslint({ eslintConfig, eslintComfigComponents })
+
+    const results = await formatAndLint({
       check : command === 'lint',
-      eslintConfig, 
-      eslintComfigComponents, 
+      eslint,
       files : filePaths, 
       prettierConfig, 
       ...remainderOptions
     })
+
+    const formatter = await eslint.loadFormatter("stylish")
+    const resultText = formatter.format(results)
+    
+    stdout.write(resultText)
   }
 }
 
