@@ -31,8 +31,14 @@ const formatAndLint = async ({
     const prettierSource = check === true 
       ? inputSource
       : await prettierFormat(inputSource, prettierParseConfig)
-    // leave off the 'filePath' or else 'results[0].output' is undefined
+    // leave off the 'filePath' or else 'results[0].output' is undefined; we want to handle rewriting the files 
+    // ourselves
     const lintResults = await eslint.lintText(prettierSource/*, { filePath: file }*/)
+    // add 'filePath' back on so that the lint results can be formatted with proper reference to the file
+    const filePath = file.startsWith(relativeStem)
+      ? file.slice(relativeStem.length + 1)
+      : file
+    lintResults[0].filePath = filePath
 
     // the output is undefined if there are no changes due to the linting, but there may be changes due to prettier, so 
     // to keep the ultimate result consistent, we have to update output if prettier did something
