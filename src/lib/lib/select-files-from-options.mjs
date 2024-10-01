@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
+import { ArgumentInvalidError } from 'standard-error-set'
 import { find } from 'find-plus'
 
 import { allExts } from '../default-config/js-extensions'
@@ -31,7 +32,8 @@ const selectFilesFromOptions = async ({
     }
     else {
       throw new ArgumentInvalidError({
-        message: "Did not find root index nor src directory; specify '--files' or '--files-paths'."
+        message: "Did not find root index nor 'src' directory to indicate default matching pattern.",
+        hint: "Specify '--files' or '--files-paths'.",
       })
     }
   }

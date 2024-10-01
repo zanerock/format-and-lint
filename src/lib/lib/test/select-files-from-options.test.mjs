@@ -36,4 +36,14 @@ describe('selectFilesFromOptions', () => {
       }
     }
   })
+
+  test('raises error if it cannot find indicators implying default search pattern', async () => {
+    try {
+      await selectFilesFromOptions({ root: join(__dirname, 'data') })
+      throw new Error('Did not raise error as expected.')
+    }
+    catch (e) {
+      expect(e.message).toMatch(/Did not find root index nor 'src' directory/)
+    }
+  })
 })
