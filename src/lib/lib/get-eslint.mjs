@@ -25,8 +25,8 @@ const getEslint = ({ check, eslintConfig, eslintConfigComponents }) => {
     // override/augmentation, it makes sense to do it relative to the file, I think.
     // flags: ['unstable_config_lookup_from_file'],
     // By default, eslint sets the 'base path' to the CWD of the process and if the linted file isn't under the 'base
-    // path', it is ignored. We want to be able to specify file wherever they are, so we explicitly se the CWD to root
-    // ('/') so it works with whatever.
+    // path', it is ignored. However, we expect either absolute file paths (from 'formatAndLint') or create absolute
+    // file paths ourselves (from fandl CLI), so we set 'cwd' to '/' so no files are reject on that basis.
     cwd                : '/',
   })
 }

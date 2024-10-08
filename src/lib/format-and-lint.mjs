@@ -12,7 +12,7 @@ const formatAndLint = async ({
   eslint,
   eslintConfig,
   eslintConfigComponents,
-  files,
+  files, // expects absolute file paths
   noWrite = false,
   outputDir,
   prettierConfig = defaultPrettierConfig,
