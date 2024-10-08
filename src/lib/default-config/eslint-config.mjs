@@ -24,6 +24,7 @@ import js from '@eslint/js'
 import stylistic from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
+import { linebreakTypesExcept } from './lib/linebreak-types-except'
 import { allExts, allExtsStr, jsxExtsStr } from './js-extensions'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -65,55 +66,6 @@ const plugins = Object.assign(
   },
   stylisticConfig.plugins
 ) // this names the plugin '@stylistic'
-
-const linebreakTypes = [
-  'block',
-  'block-like',
-  'break',
-  'case',
-  'cjs-export',
-  'cjs-import',
-  'class',
-  'const',
-  'continue',
-  'debugger',
-  'default',
-  'directive',
-  'do',
-  'empty',
-  'export',
-  'expression',
-  'for',
-  'function',
-  'if',
-  'iife',
-  'import',
-  'let',
-  'multiline-block-like',
-  'multiline-const',
-  'multiline-expression',
-  'multiline-let',
-  'multiline-var',
-  'return',
-  'singleline-const',
-  'singleline-let',
-  'singleline-var',
-  'switch',
-  'throw',
-  'try',
-  'var',
-  'while',
-  'with',
-]
-
-const linbreakTypesExcept = (...types) => {
-  const result = [...linebreakTypes]
-  for (const type of types) {
-    result.splice(result.indexOf(type), 1)
-  }
-
-  return result
-}
 
 const rules = {
   ...js.configs.recommended.rules,
@@ -187,25 +139,24 @@ const rules = {
     { blankLine : 'always', prev : '*', next : 'class' },
     {
       blankLine : 'always',
-      prev      : linbreakTypesExcept('cjs-export', 'export'),
+      prev      : linebreakTypesExcept('cjs-export', 'export'),
       next      : 'export',
     },
     {
       blankLine : 'always',
-      prev      : linbreakTypesExcept('cjs-export', 'export'),
+      prev      : linebreakTypesExcept('cjs-export', 'export'),
       next      : 'cjs-export',
     },
     {
       blankLine : 'always',
       prev      : 'import',
-      next      : linbreakTypesExcept('import'),
+      next      : linebreakTypesExcept('import'),
     },
-    // { blankLine : 'always', prev : 'cjs-import', next : linbreakTypesExcept('cjs-import') },
     {
       blankLine : 'always',
       prev      : 'cjs-import',
       // Because a cjs-import is actually many different things...
-      next      : linbreakTypesExcept(
+      next      : linebreakTypesExcept(
         'cjs-import',
         'const',
         'let',
@@ -302,7 +253,7 @@ const defaultBaseConfig = {
       sourceType        : 'module',
       requireConfigFile : true,
       babelOptions      : { configFile : babelConfigPath },
-      ecmaFeatures : { jsx : true },
+      ecmaFeatures      : { jsx : true },
     },
     ecmaVersion : 'latest',
   },
