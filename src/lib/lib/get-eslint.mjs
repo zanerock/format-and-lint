@@ -1,7 +1,7 @@
 import { ESLint } from 'eslint'
 import { ArgumentInvalidError } from 'standard-error-set'
 
-import { getEslintConfig } from '../default-config/eslint.config'
+import { getEslintConfig } from '../default-config/eslint-config'
 
 const getEslint = ({ check, eslintConfig, eslintConfigComponents }) => {
   if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
