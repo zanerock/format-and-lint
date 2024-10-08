@@ -49,7 +49,7 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
 
     const eslint = getEslint({ check, eslintConfig, eslintComfigComponents })
 
-    const results = await formatAndLint({
+    const { lintResults } = await formatAndLint({
       ...remainderOptions, // must come first; will commonly specify 'files'
       check,
       eslint,
@@ -63,7 +63,7 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
     // 2) FORCE_COLOR env var
     // 3) output stream type
     const formatter = await eslint.loadFormatter('stylish')
-    const resultText = formatter.format(results)
+    const resultText = formatter.format(lintResults)
 
     stdout.write(resultText)
     // if we had something to say, then that indicates an error/warning in the source
