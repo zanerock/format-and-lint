@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import * as path from 'node:path'
 
 import { format as prettierFormat } from 'prettier'
-import { ArgumentInvalidError } from 'standard-error-set'
+import { ArgumentInvalidError, ArgumentMissingError } from 'standard-error-set'
 
 import { getEslint } from './lib/get-eslint'
 import { prettierConfig as defaultPrettierConfig } from './default-config/prettier.config'
@@ -13,9 +13,20 @@ const formatAndLint = async (options) => {
     check = false,
     eslintConfig,
     eslintConfigComponents,
-    files, // expects absolute file paths
     prettierConfig = defaultPrettierConfig,
   } = options
+
+  if (options.files === undefined || options.files.length === 0) {
+    throw new ArgumentMissingError({
+      argumentName  : 'files',
+      argumentType  : 'string[]',
+      argumentValue : options.files,
+    })
+  }
+
+  // make files absolute
+  const files = options.files.map((f) => path.resolve(f))
+
   const processOptions = Object.assign({}, options)
 
   if (processOptions.eslint === undefined) {

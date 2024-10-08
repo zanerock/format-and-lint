@@ -14,7 +14,12 @@ const __dirname = myDirFromImport(import.meta.url)
 // eslint-disable-next-line max-lines-per-function
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
-    const args = { check : true, eslintConfig : [], eslintConfigComponents : [] }
+    const args = {
+      check                  : true,
+      eslintConfig           : [],
+      eslintConfigComponents : [],
+      files                  : ['foo.js'],
+    }
     try {
       // expect(() => formatAndLint(args)).toThrow(/You cannot define/)
       await formatAndLint(args)
