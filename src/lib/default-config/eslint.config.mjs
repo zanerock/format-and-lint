@@ -8,81 +8,50 @@
  * Our one exception to the standard style is implementing aligned colons on multiline
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
-const { readFileSync } = require('node:fs')
-const { join } = require('node:path')
-const babelParser = require('@babel/eslint-parser')
-const stylistic = require('@stylistic/eslint-plugin')
-const globalsPkg = require('globals')
-const importPlugin = require('eslint-plugin-import')
-const jsdocPlugin = require('eslint-plugin-jsdoc')
-const nodePlugin = require('eslint-plugin-node')
-const promisePlugin = require('eslint-plugin-promise')
-const nPlugin = require('eslint-plugin-n')
-const standardPlugin = require('eslint-config-standard')
+import { existsSync, readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import globalsPkg from 'globals'
+import importPlugin from 'eslint-plugin-import'
+import jsdocPlugin from 'eslint-plugin-jsdoc'
+import nodePlugin from 'eslint-plugin-node'
+import promisePlugin from 'eslint-plugin-promise'
+import nPlugin from 'eslint-plugin-n'
+import babelParser from '@babel/eslint-parser'
+import { fixupPluginRules } from '@eslint/compat'
+import js from '@eslint/js'
+import stylistic from '@stylistic/eslint-plugin'
+import standardPlugin from 'eslint-config-standard'
+
+import { allExts, allExtsStr, jsxExtsStr } from './js-extensions'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const babelConfigPathInstalled = join(__dirname, 'babel', 'babel.config.cjs')
+const babelConfigPathTest = join('dist', 'babel', 'babel.config.cjs')
+
+const babelConfigPath =
+  existsSync(babelConfigPathInstalled) === true
+    ? babelConfigPathInstalled
+    : existsSync(babelConfigPathTest)
+      ? babelConfigPathTest
+      : undefined
+if (babelConfigPath === undefined) {
+  throw new Error('Could not find babel config file.')
+}
 
 const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
 const packageJSON = JSON.parse(packageContents)
 const {
-  _sdlc,
   dependencies = {},
   devDependencies = {},
   engines = { node : true },
 } = packageJSON
 
-let gitignoreContents
-try {
-  gitignoreContents = readFileSync('./.gitignore', { encoding : 'utf8' })
-}
-catch (e) {
-  if (e.code !== 'ENOENT') {
-    throw e
-  }
-  // else, it's fine there is just no .gitignore
-}
-
 const usesReact =
   dependencies.react !== undefined || devDependencies.react !== undefined
 const reactSettings = usesReact ? { version : 'detect' } : {}
-
-// first we set up the files to ignore by reading out '.gitignore'
-const commonIgnores = ['doc/**', 'dist/**']
-if (process.env.CHECK_DATA_FILES === undefined) {
-  commonIgnores.push('**/test/data/**/*')
-}
-
-if (
-  gitignoreContents !== undefined
-  && process.env.SDLC_LINT_SKIP_GITIGNORE !== 'true'
-) {
-  const gitignoreLines = gitignoreContents.split(/\r?\n/)
-  for (const gitIgnore of gitignoreLines) {
-    if (gitIgnore.trim() === '') continue
-
-    let newIgnore
-    if (gitIgnore.startsWith('/')) {
-      newIgnore = gitIgnore.slice(1)
-    }
-    else {
-      newIgnore = '**/' + gitIgnore
-    }
-    if (!newIgnore.endsWith('/')) {
-      newIgnore += '/'
-    }
-    newIgnore += '**'
-
-    commonIgnores.push(newIgnore)
-  }
-}
-
-// we also include any ignores from the package.json
-if (
-  _sdlc !== undefined
-  && _sdlc.linting !== undefined
-  && process.env.SDLC_LINT_SKIP_PACKAGE_IGNORES !== 'true'
-) {
-  const { ignores } = _sdlc.linting
-  commonIgnores.push(...ignores)
-}
 
 const stylisticConfig = stylistic.configs['recommended-flat']
 
@@ -147,8 +116,9 @@ const linbreakTypesExcept = (...types) => {
 }
 
 const rules = {
+  ...js.configs.recommended.rules,
   ...standardPlugin.rules,
-  ...stylisticConfig.rules,
+  ...stylisticConfig.rules, // the stylistic rules also cover react rules
   // override key spacing to get things aligned
   '@stylistic/key-spacing' : [
     'error',
@@ -272,8 +242,38 @@ const rules = {
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
   // which we need to import for react to work, even when not used
   'no-unused-vars'                  : ['error', { varsIgnorePattern : 'React' }],
-  // this is our one modification to JS Standard style
+  // style/consistency rules
+  // this modifies JS Standard style
   'prefer-regex-literals'           : 'error',
+  'yoda'                            : ['error', 'never'],
+  // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
+  'no-console'                      : 'error',
+  // efficiency rules
+  'no-await-in-loop'                : 'error',
+  // rules for odd code/possible red flags/unintentional logic
+  'no-lonely-if'                    : 'error',
+  'no-return-assign'                : 'error',
+  'no-shadow'                       : 'error',
+  'no-extra-label'                  : 'error',
+  'no-label-var'                    : 'error',
+  'no-invalid-this'                 : 'error',
+  'no-unreachable-loop'             : 'error',
+  'no-extra-bind'                   : 'error',
+  'require-await'                   : 'error',
+  'consistent-return'               : 'error',
+  'default-case-last'               : 'error',
+  'eqeqeq'                          : 'error',
+  // limit code complexity
+  'complexity'                      : ['error', 20], // default val
+  'max-depth'                       : ['error', 4], // default val
+  'max-lines'                       : [
+    'error',
+    { max : 300, skipBlankLines : true, skipComments : true },
+  ], // default val,
+  'max-lines-per-function' : [
+    'error',
+    { max : 50, skipBlankLines : true, skipComments : true },
+  ],
 }
 
 // OK, so the standard plugin provides lots of nice rules, but there are some conflicts, so we delete them (and let the
@@ -288,91 +288,85 @@ delete rules['key-spacing'] // redundant with @stylistic
 delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 delete rules['space-before-function-paren'] // we override default and redundant anyway
-// delete rules['@stylistic/indent']
-delete rules['@stylistic/indent-binary-ops']
+delete rules['@stylistic/indent-binary-ops'] // this is handled better by prettier
+// deprecated rules
+delete rules['quote-props']
 
-/* // react now covered by stylistic
-if (usesReact === true) {
-  plugins.react = reactPlugin
-  Object.assign(rules, reactPlugin.configs.recommended.rules)
-} */
+const allFiles = [`**/*{${allExtsStr}}`]
 
-const files =
-  process.env.FORMAT_FILES === undefined
-    ? ['**/*.{cjs,js,jsx,mjs}']
-    : [process.env.FORMAT_FILES]
-
-const eslintConfig = [
-  // setting 'ignores' like this excludes the matching files from any processing; setting 'ignores' with 'files' in the
-  // same object only excludes the ignored files from those rules but not from being processed alltogether
-  { ignores : commonIgnores },
-  // general standard rules; the react rules have to go here to or else ESLint thinks components aren't used and
-  // triggers the 'no-unused-vars' rule
-  {
-    files,
-    languageOptions : {
-      parser        : babelParser,
-      parserOptions : {
-        sourceType        : 'module',
-        requireConfigFile : true,
-        babelOptions      : {
-          configFile : join(__dirname, 'babel', 'babel.config.cjs'),
-        },
-        ecmaFeatures : { jsx : true },
+const defaultBaseConfig = {
+  files           : allFiles,
+  languageOptions : {
+    parser        : babelParser,
+    parserOptions : {
+      sourceType        : 'module',
+      requireConfigFile : true,
+      babelOptions      : {
+        configFile : babelConfigPath,
       },
-      ecmaVersion : 'latest',
+      ecmaFeatures : { jsx : true },
     },
-    settings : { react : reactSettings },
-    plugins,
-    rules,
+    ecmaVersion : 'latest',
   },
-  // jsdoc rules
-  {
-    files,
-    ignores : ['**/index.{js,cjs,mjs}', '**/__tests__/**/*', '**/*.test.*'],
-    plugins : { jsdoc : jsdocPlugin },
-    rules   : {
-      ...jsdocPlugin.configs['flat/recommended-error'].rules,
-      'jsdoc/require-description' : 'error',
-      // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
-      // e.g., func(foo = true)), but if this is possible, it's not working for us.
-      'jsdoc/no-defaults'         : 'off',
-      'jsdoc/check-tag-names'     : ['error', { definedTags : ['category'] }],
-    },
-  },
-  // add necessary globals and react settinsg when processing JSX files
-  {
-    files           : ['**/*.jsx'],
-    languageOptions : { globals : globalsPkg.browser },
-  },
-  // adds correct globals when processing jest tests
-  {
-    files           : ['**/_tests_/**', '**/*.test.{cjs,js,jsx,mjs}'],
-    languageOptions : { globals : globalsPkg.jest },
-  },
-]
+  settings : { react : reactSettings },
+  plugins,
+  rules,
+}
 
 if (engines?.node !== undefined) {
-  eslintConfig.push({
-    files           : ['**/*.{cjs,js,jsx,mjs}'],
-    plugins         : { node : nodePlugin },
-    languageOptions : {
-      // globals used to define structuredClone (I'm pretty sure), but now doesn't for some reason...
-      globals : { structuredClone : false, ...globalsPkg.node },
-    },
-    rules : {
-      ...nodePlugin.configs.recommended.rules,
-      'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
-      'node/prefer-promises/dns'               : 'error',
-      'node/prefer-promises/fs'                : 'error',
-      'node/no-missing-import'                 : [
-        'error',
-        {
-          tryExtensions : ['.js', '.cjs', '.mjs', '.jsx'],
-        },
-      ],
-    },
+  defaultBaseConfig.plugins.node = fixupPluginRules(nodePlugin)
+  // TODO: actually, we don't want this for MJS files... but I'm not sure what we do want
+  defaultBaseConfig.languageOptions.globals = globalsPkg.node
+  Object.assign(defaultBaseConfig.rules, {
+    ...nodePlugin.configs.recommended.rules,
+    'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
+    'node/prefer-promises/dns'               : 'error',
+    'node/prefer-promises/fs'                : 'error',
+    'node/no-missing-import'                 : [
+      'error',
+      {
+        tryExtensions : allExts,
+      },
+    ],
   })
 }
 
-module.exports = eslintConfig
+const defaultJsdocConfig = {
+  files   : allFiles,
+  ignores : [`**/index{${allExtsStr}}`, '**/__tests__/**/*', '**/*.test.*'],
+  plugins : { jsdoc : jsdocPlugin },
+  rules   : {
+    ...jsdocPlugin.configs['flat/recommended-error'].rules,
+    'jsdoc/require-description' : 'error',
+    // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
+    // e.g., func(foo = true)), but if this is possible, it's not working for us.
+    'jsdoc/no-defaults'         : 'off',
+    'jsdoc/check-tag-names'     : ['error', { definedTags : ['category'] }],
+  },
+}
+
+const defaultJsxConfig = {
+  files           : [`**/*{${jsxExtsStr}}`],
+  // add necessary globals when processing JSX files
+  languageOptions : { globals : globalsPkg.browser },
+}
+
+const defaultTestsConfig = {
+  files           : ['**/_tests_/**', `**/*.test{${allExtsStr}}`],
+  // adds correct globals when processing jest tests
+  languageOptions : { globals : globalsPkg.jest },
+}
+
+const getEslintConfig = ({
+  additional = {},
+  base = defaultBaseConfig,
+  jsdoc = defaultJsdocConfig,
+  jsx = defaultJsxConfig,
+  tests = defaultTestsConfig,
+} = {}) => {
+  const eslintConfig = [base, jsdoc, jsx, tests, additional]
+
+  return eslintConfig
+}
+
+export { getEslintConfig }

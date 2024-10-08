@@ -1,0 +1,14 @@
+projects:
+  badges:
+    coverage:
+      dependencies: []
+      artifacts:
+        - builder: '@liquid-labs/sdlc-projects-badges-coverage'
+          version: 1.0.0-alpha.2
+          priority: 0
+          content: >-
+            [![coverage:
+            97%](./.readme-assets/coverage.svg)](https://github.com/liquid-labs/format-and-lint/pulls?q=is%3Apr+is%3Aclosed)
+          path: >-
+            /Users/zane/playground/pkgdev/format-and-lint/.readme-assets/coverage.svg
+          purpose: Test coverage badge for README.md.

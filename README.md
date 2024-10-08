@@ -1,6 +1,7 @@
-# @pkgdev/sdlc-resource-eslint
+# @pkgdev/format-and-lint
+[![coverage: 97%](./.readme-assets/coverage.svg)](https://github.com/liquid-labs/format-and-lint/pulls?q=is%3Apr+is%3Aclosed)
 
-Pre-configured formatting and style tool combining prettier and eslint.
+Pre-configured formatting and style tool combining the best of prettier and eslint.
 
 ## Formatting overview
 

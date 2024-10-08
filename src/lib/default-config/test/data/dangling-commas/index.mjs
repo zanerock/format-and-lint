@@ -1,10 +1,6 @@
-import {
-  blah
-} from 'bar' // eslint-disable-line node/no-missing-import
-
 // we expect dangling commas in data structures
 const foo = {
-  bar : blah // should have comma!
+  bar : 'blah' // should have comma!
 }
 
 const bar = [
@@ -12,8 +8,8 @@ const bar = [
 ]
 
 // but not function decls
-const baz = (bar) => {
-  return bar
+const baz = (bing) => {
+  return bing
 }
 
 // or calls
