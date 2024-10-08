@@ -3,7 +3,7 @@ import { ArgumentInvalidError } from 'standard-error-set'
 
 import { getEslintConfig } from '../default-config/eslint.config'
 
-const getEslint = ({ eslintConfig, eslintConfigComponents }) => {
+const getEslint = ({ check, eslintConfig, eslintConfigComponents }) => {
   if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
     throw new ArgumentInvalidError({
       message :
@@ -16,7 +16,7 @@ const getEslint = ({ eslintConfig, eslintConfigComponents }) => {
   }
 
   return new ESLint({
-    fix                : true,
+    fix                : check === false,
     // this keeps eslint from insisting on an eslint config file
     overrideConfigFile : true,
     overrideConfig     : eslintConfig,

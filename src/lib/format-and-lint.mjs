@@ -19,7 +19,7 @@ const formatAndLint = async ({
   relativeStem = process.cwd(),
 }) => {
   if (eslint === undefined) {
-    eslint = getEslint({ eslintConfig, eslintConfigComponents })
+    eslint = getEslint({ check, eslintConfig, eslintConfigComponents })
   }
 
   const prettierParseConfig = structuredClone(prettierConfig)
