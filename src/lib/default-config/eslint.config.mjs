@@ -20,6 +20,7 @@ import promisePlugin from 'eslint-plugin-promise'
 import nPlugin from 'eslint-plugin-n'
 import babelParser from '@babel/eslint-parser'
 import { fixupPluginRules } from '@eslint/compat'
+import js from '@eslint/js'
 import stylistic from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
@@ -115,6 +116,7 @@ const linbreakTypesExcept = (...types) => {
 }
 
 const rules = {
+  ...js.configs.recommended.rules,
   ...standardPlugin.rules,
   ...stylisticConfig.rules, // the stylistic rules also cover react rules
   // override key spacing to get things aligned
@@ -240,8 +242,38 @@ const rules = {
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
   // which we need to import for react to work, even when not used
   'no-unused-vars'                  : ['error', { varsIgnorePattern : 'React' }],
-  // this is our one modification to JS Standard style
+  // style/consistency rules
+  // this modifies JS Standard style
   'prefer-regex-literals'           : 'error',
+  'yoda'                            : ['error', 'never'],
+  // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
+  'no-console'                      : 'error',
+  // efficiency rules
+  'no-await-in-loop'                : 'error',
+  // rules for odd code/possible red flags/unintentional logic
+  'no-lonely-if'                    : 'error',
+  'no-return-assign'                : 'error',
+  'no-shadow'                       : 'error',
+  'no-extra-label'                  : 'error',
+  'no-label-var'                    : 'error',
+  'no-invalid-this'                 : 'error',
+  'no-unreachable-loop'             : 'error',
+  'no-extra-bind'                   : 'error',
+  'require-await'                   : 'error',
+  'consistent-return'               : 'error',
+  'default-case-last'               : 'error',
+  'eqeqeq'                          : 'error',
+  // limit code complexity
+  'complexity'                      : ['error', 20], // default val
+  'max-depth'                       : ['error', 4], // default val
+  'max-lines'                       : [
+    'error',
+    { max : 300, skipBlankLines : true, skipComments : true },
+  ], // default val,
+  'max-lines-per-function' : [
+    'error',
+    { max : 50, skipBlankLines : true, skipComments : true },
+  ],
 }
 
 // OK, so the standard plugin provides lots of nice rules, but there are some conflicts, so we delete them (and let the
@@ -257,6 +289,8 @@ delete rules['operator-linebreak'] // they say after, we say before
 delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
 delete rules['space-before-function-paren'] // we override default and redundant anyway
 delete rules['@stylistic/indent-binary-ops'] // this is handled better by prettier
+// deprecated rules
+delete rules['quote-props']
 
 const allFiles = [`**/*{${allExtsStr}}`]
 
