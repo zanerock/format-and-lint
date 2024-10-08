@@ -9,6 +9,8 @@ DIST:=dist
 QA:=qa
 
 ALL_JS_FILES_SRC:=$(shell find $(SRC) -name "*.js" -o -name "*.cjs" -o -name "*.mjs")
+ALL_LIB_JS_FILES_SRC:=$(shell find $(SRC)/lib -name "*.js" -o -name "*.cjs" -o -name "*.mjs")
+ALL_NON_TEST_JS_FILES_SRC:=$(shell find $(SRC) \( -name "*.js" -o -name "*.cjs" -o -name "*.mjs" \) -not -path "**/test/**")
 
 BABEL_CONFIG_DIST:=$(DIST)/babel/babel-shared.config.cjs $(DIST)/babel/babel.config.cjs
 BABEL_PKG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -- pwd)
@@ -18,6 +20,7 @@ ROLLUP_CONFIG:=$(shell npm explore @liquid-labs/sdlc-resource-babel-and-rollup -
 
 default: all
 
+# set up the Babel config setup that we need to travel with the library and CLI tool
 $(CONFIG_FILES_DIST): $(DIST)/%: $(LIB_SRC)/%
 	mkdir -p $(dir $@)
 	cp $< $@
@@ -25,6 +28,16 @@ $(CONFIG_FILES_DIST): $(DIST)/%: $(LIB_SRC)/%
 $(BABEL_CONFIG_DIST): $(DIST)/babel/%: $(BABEL_PKG)/dist/babel/%
 	mkdir -p $(dir $@)
 	cp $< $@
+
+# set up the library build
+FANDL_LIB:=$(DIST)/fandl.js
+FANDL_LIB_ENTRY:=$(SRC)/lib/index.mjs
+
+$(FANDL_LIB): package.json $(ALL_LIB_JS_FILES_SRC)
+	JS_BUILD_TARGET=$(FANDL_LIB_ENTRY) \
+		JS_OUT=$@ \
+		JS_FORMAT=cjs \
+	  $(ROLLUP) --config $(ROLLUP_CONFIG)
 
 FANDL_EXEC:=$(DIST)/fandl-exec.js
 FANDL_EXEC_ENTRY:=$(SRC)/cli/index.mjs
@@ -78,13 +91,30 @@ lint-fix: $(ALL_JS_FILES_SRC) $(BUILD_TARGETS)
 	@( set -e; set -o pipefail; \
 	  $(FANDL_EXEC) )
 
+README_MD:=README.md
+README_MD_SRC:=$(shell find $(SRC)/docs -name "*.md") $(ALL_NON_TEST_JS_FILES_SRC)
+
+$(README_MD): $(README_MD_SRC)
+	cp $(SRC)/docs/README.01.md $@
+	npx jsdoc2md \
+	  --configure ./jsdoc.config.json \
+	  --files 'src/**/*' \
+	  --global-index-format grouped \
+	  --name-format \
+	  --plugin dmd-readme-api \
+	  --plugin @liquid-labs/dmd \
+	  --clever-links \
+	  --no-cache \
+	  >> $@
+	  cat $(SRC)/docs/README.02.md >> $@
+
 test: $(TEST_REPORT) $(TEST_PASS_MARKER)
 
 lint: $(LINT_REPORT) $(LINT_PASS_MARKER)
 
 qa: test lint
 
-build: $(BABEL_CONFIG_DIST) $(FANDL_EXEC)
+build: $(BABEL_CONFIG_DIST) $(FANDL_LIB) $(FANDL_EXEC) $(README_MD)
 
 all: build
 

@@ -3,9 +3,9 @@
  */
 import { ESLint } from 'eslint'
 
-import { getEslintConfig } from '../eslint.config'
+import { getEslintConfig } from '../eslint-config'
 
-describe('eslint.config.cjs', () => {
+describe('eslint-config.mjs', () => {
   const lintTests = [
     [
       'detects non-literal regex',
