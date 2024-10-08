@@ -2,12 +2,13 @@
   "name": "@pkgdev/format-and-lint",
   "version": "1.0.0-alpha.22",
   "description": "Pre-configured formatting and style tool combining prettier and eslint.",
+  "main": "./dist/fandl.js",
+  "bin": {
+    "fandl": "./dist/fandl-exec.js"
+  },
   "files": [
     "dist/"
   ],
-  "bin": {
-    "fandl": "./dist/fandl.sh"
-  },
   "engines": {
     "node": ">=18.0.0"
   },
