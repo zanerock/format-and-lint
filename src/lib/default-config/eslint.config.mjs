@@ -301,9 +301,7 @@ const defaultBaseConfig = {
     parserOptions : {
       sourceType        : 'module',
       requireConfigFile : true,
-      babelOptions      : {
-        configFile : babelConfigPath,
-      },
+      babelOptions      : { configFile : babelConfigPath },
       ecmaFeatures : { jsx : true },
     },
     ecmaVersion : 'latest',
@@ -355,6 +353,10 @@ const defaultTestsConfig = {
   files           : ['**/_tests_/**', `**/*.test{${allExtsStr}}`],
   // adds correct globals when processing jest tests
   languageOptions : { globals : globalsPkg.jest },
+  rules           : {
+    // override default check for tests; Jest 'describe' functions can get very long, nad that's OK
+    'max-lines-per-function' : 'off',
+  },
 }
 
 const getEslintConfig = ({
@@ -362,9 +364,9 @@ const getEslintConfig = ({
   base = defaultBaseConfig,
   jsdoc = defaultJsdocConfig,
   jsx = defaultJsxConfig,
-  tests = defaultTestsConfig,
+  test = defaultTestsConfig,
 } = {}) => {
-  const eslintConfig = [base, jsdoc, jsx, tests, additional]
+  const eslintConfig = [base, jsdoc, jsx, test, additional]
 
   return eslintConfig
 }
