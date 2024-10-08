@@ -1,6 +1,6 @@
-# @pkgdev/sdlc-resource-eslint
+# @pkgdev/format-and-lint
 
-Pre-configured formatting and style tool combining prettier and eslint.
+Pre-configured formatting and style tool combining the best of prettier and eslint.
 
 ## Formatting overview
 
