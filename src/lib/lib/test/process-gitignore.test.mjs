@@ -1,7 +1,7 @@
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { jest } from '@jest/globals'
+import { jest } from '@jest/globals' // eslint-disable-line node/no-extraneous-import
 
 import { processGitignore } from '../process-gitignore'
 
@@ -53,7 +53,6 @@ describe('processGitignore', () => {
   })
 
   test("prints warning on 'warnOnNotIgnore=true' on negative ignore pattern", async () => {
-    const origStderr = process.stderr
     await processGitignore({
       warnOnNotIgnore : true,
       path            : join(__dirname, 'data', 'test-gitignore-negative.txt'),

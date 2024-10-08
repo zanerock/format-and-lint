@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises'
-
 import gitIgnoreToGlob from 'gitignore-to-glob'
 import { CommonError } from 'standard-error-set'
 

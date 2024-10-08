@@ -2,7 +2,7 @@
  * @file Tests the config works as expected based on a sampling of rules.
  */
 import { readFile, rm } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
 
 import { copyDirToTmp, getTmpDir } from '../../test/lib/copy-dir-to-tmp'
 import { formatAndLint } from '../format-and-lint'

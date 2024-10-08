@@ -1,9 +1,4 @@
-import { existsSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
-
 import commandLineArgs from 'command-line-args'
-import { format as prettierFormat } from 'prettier'
 import { ArgumentInvalidError } from 'standard-error-set'
 
 import { cliSpec } from './cli-spec'
@@ -11,9 +6,6 @@ import { formatAndLint } from '../lib/format-and-lint'
 import { getEslint } from '../lib/lib/get-eslint'
 import { processConfigFile } from './lib/process-config-file'
 import { selectFilesFromOptions } from '../lib/lib/select-files-from-options'
-
-const prettierBin = 'npx prettier'
-const eslintBin = 'npx eslint'
 
 const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
   const mainOpts = commandLineArgs(cliSpec.arguments, {
@@ -48,6 +40,8 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
       ...remainderOptions
     } = options
 
+    const check = command === 'lint'
+
     if (
       eslintConfigPath !== undefined
       && eslintConfigComponentsPath !== undefined
@@ -75,10 +69,10 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
         ? undefined
         : await processConfigFile(prettierConfigPath)
 
-    const eslint = getEslint({ eslintConfig, eslintComfigComponents })
+    const eslint = getEslint({ check, eslintConfig, eslintComfigComponents })
 
     const results = await formatAndLint({
-      check : command === 'lint',
+      check,
       eslint,
       files : filePaths,
       prettierConfig,
@@ -96,7 +90,7 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
     stdout.write(resultText)
     // if we had something to say, then that indicates an error/warning in the source
     if (resultText !== '') {
-      process.exit(1)
+      process.exit(1) // eslint-disable-line  no-process-exit
     }
   }
 }

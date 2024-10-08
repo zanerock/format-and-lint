@@ -34,7 +34,8 @@ const formatAndLint = async ({
         : await prettierFormat(inputSource, prettierParseConfig)
     const lintResults = await eslint.lintText(
       // we must specify the file path in order for the proper rules from the flat config to attach
-      prettierSource, { filePath: file }
+      prettierSource,
+      { filePath : file }
     )
 
     // the output is undefined if there are no changes due to the linting, but there may be changes due to prettier, so

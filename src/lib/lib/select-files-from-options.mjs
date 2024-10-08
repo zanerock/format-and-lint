@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 
 import { ArgumentInvalidError } from 'standard-error-set'
 import { find } from 'find-plus'
