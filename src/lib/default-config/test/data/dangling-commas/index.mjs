@@ -8,8 +8,8 @@ const bar = [
 ]
 
 // but not function decls
-const baz = (bar) => {
-  return bar
+const baz = (bing) => {
+  return bing
 }
 
 // or calls

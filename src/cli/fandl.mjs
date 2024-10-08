@@ -16,43 +16,21 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
   const command = mainOpts.command || 'format-and-lint'
 
   if (command === 'format-and-lint' || command === 'lint') {
-    const options =
-      mainOpts._unknown === undefined
-        ? mainOpts
-        : Object.assign(
-          {},
-          mainOpts,
-          commandLineArgs(
-            cliSpec.commands.find((c) => c.name === command).arguments,
-            { argv : mainOpts._unknown, camelCase : true }
-          )
-        )
+    const options = extractFormatOrLintOptions(command, mainOpts)
 
     const {
-      files,
-      filesPaths,
+      // see 'selectFilesFromOptions' for additional options processed by fandl
       eslintConfigPath,
       eslintConfigComponentsPath,
-      ignoreFiles,
-      ignoreFilesPaths,
-      noStandardIgnores,
       prettierConfigPath,
       ...remainderOptions
     } = options
 
     const check = command === 'lint'
 
-    if (
-      eslintConfigPath !== undefined
-      && eslintConfigComponentsPath !== undefined
-    ) {
-      throw new ArgumentInvalidError({
-        message :
-          "Specifying both '--eslint-config-path' and '--eslint-config-components-path' is invalid. Please specify one or the other.",
-      })
-    }
+    verifyArgs(options)
 
-    const filePaths = await selectFilesFromOptions(options)
+    const filePaths = await selectFilesFromOptions(remainderOptions)
 
     const eslintConfig =
       eslintConfigPath === undefined
@@ -72,11 +50,11 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
     const eslint = getEslint({ check, eslintConfig, eslintComfigComponents })
 
     const results = await formatAndLint({
+      ...remainderOptions, // must come first; will commonly specify 'files'
       check,
       eslint,
       files : filePaths,
       prettierConfig,
-      ...remainderOptions,
     })
 
     // TODO: support '--color', '--no-color options; The formatter internally uses 'chalk', which auto-detects color
@@ -92,6 +70,30 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
     if (resultText !== '') {
       process.exit(1) // eslint-disable-line  no-process-exit
     }
+  }
+}
+
+const extractFormatOrLintOptions = (command, mainOpts) =>
+  mainOpts._unknown === undefined
+    ? mainOpts
+    : Object.assign(
+      {},
+      mainOpts,
+      commandLineArgs(
+        cliSpec.commands.find((c) => c.name === command).arguments,
+        { argv : mainOpts._unknown, camelCase : true }
+      )
+    )
+
+const verifyArgs = ({ eslintConfigPath, eslintConfigComponentsPath }) => {
+  if (
+    eslintConfigPath !== undefined
+    && eslintConfigComponentsPath !== undefined
+  ) {
+    throw new ArgumentInvalidError({
+      message :
+        "Specifying both '--eslint-config-path' and '--eslint-config-components-path' is invalid. Please specify one or the other.",
+    })
   }
 }
 

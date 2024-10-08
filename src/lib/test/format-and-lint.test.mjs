@@ -11,6 +11,7 @@ import { myDirFromImport } from '../../test/lib/my-dir-from-import'
 
 const __dirname = myDirFromImport(import.meta.url)
 
+// eslint-disable-next-line max-lines-per-function
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
     const args = { check : true, eslintConfig : [], eslintConfigComponents : [] }

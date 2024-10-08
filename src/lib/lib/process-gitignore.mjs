@@ -1,7 +1,7 @@
 import gitIgnoreToGlob from 'gitignore-to-glob'
 import { CommonError } from 'standard-error-set'
 
-const processGitignore = async ({ path = '.gitignore', warnOnNotIgnore }) => {
+const processGitignore = ({ path = '.gitignore', warnOnNotIgnore }) => {
   try {
     const patterns = gitIgnoreToGlob(path)
     const checkNotIgnore =
@@ -35,6 +35,8 @@ const processGitignore = async ({ path = '.gitignore', warnOnNotIgnore }) => {
     if (e.code !== 'NOENT') {
       throw e
     }
+
+    return []
   }
 }
 

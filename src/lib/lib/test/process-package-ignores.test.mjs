@@ -3,7 +3,7 @@ import { setReadFileResults } from './mock-read-file'
 describe('processPackageIgnores', () => {
   let processPackageIgnores
   beforeAll(async () => {
-    ;({ processPackageIgnores } = await import('../process-package-ignores'))
+    ({ processPackageIgnores } = await import('../process-package-ignores'))
   })
 
   test('loads ignores from package.json', async () => {

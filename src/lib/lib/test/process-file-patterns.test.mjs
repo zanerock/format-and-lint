@@ -3,7 +3,7 @@ import './mock-read-file'
 describe('process-file-patterns', () => {
   let processFilePatterns
   beforeAll(async () => {
-    ;({ processFilePatterns } = await import('../process-file-patterns'))
+    ({ processFilePatterns } = await import('../process-file-patterns'))
   })
 
   test('combines patterns and file patterns', async () => {

@@ -24,8 +24,8 @@ describe('processGitignore', () => {
     stderr.mockRestore()
   })
 
-  test('generates file patterns', async () => {
-    const results = await processGitignore({
+  test('generates file patterns', () => {
+    const results = processGitignore({
       path : join(__dirname, 'data', 'test-gitignore.txt'),
     })
     expect(results).toEqual([
@@ -38,9 +38,9 @@ describe('processGitignore', () => {
     ])
   })
 
-  test('throws error by default on negative ignore pattern', async () => {
+  test('throws error by default on negative ignore pattern', () => {
     try {
-      await processGitignore({
+      processGitignore({
         path : join(__dirname, 'data', 'test-gitignore-negative.txt'),
       })
       throw new Error('Did not throw as expected.')
@@ -52,8 +52,8 @@ describe('processGitignore', () => {
     }
   })
 
-  test("prints warning on 'warnOnNotIgnore=true' on negative ignore pattern", async () => {
-    await processGitignore({
+  test("prints warning on 'warnOnNotIgnore=true' on negative ignore pattern", () => {
+    processGitignore({
       warnOnNotIgnore : true,
       path            : join(__dirname, 'data', 'test-gitignore-negative.txt'),
     })

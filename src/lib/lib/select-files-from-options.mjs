@@ -45,7 +45,7 @@ const selectFilesFromOptions = async ({
   )
   if (noStandardIgnores !== true) {
     ignorePatterns.push(...standardIgnores)
-    ignorePatterns.push(...(await processGitignore({ warnOnNotIgnore : true })))
+    ignorePatterns.push(...processGitignore({ warnOnNotIgnore : true }))
   }
   if (ignorePackageSettings !== true) {
     ignorePatterns.push(...(await processPackageIgnores()))

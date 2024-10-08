@@ -1,2 +1,2 @@
 // the newline is actually an '\r\n'
-console.log('foo')
+export const FOO = 1

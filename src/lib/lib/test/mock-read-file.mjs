@@ -9,7 +9,7 @@ jest.unstable_mockModule('node:fs/promises', () => ({
 }))
 
 const setReadFileResults = (results) =>
-  readFile.mockImplementation(async () => results)
+  readFile.mockImplementation(async () => results) // eslint-disable-line require-await
 
 setReadFileResults(`src2/*.mjs
 # foo

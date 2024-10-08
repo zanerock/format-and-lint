@@ -8,6 +8,7 @@ import { myDirFromImport } from '../../test/lib/my-dir-from-import'
 
 const __dirname = myDirFromImport(import.meta.url)
 
+// eslint-disable-next-line max-lines-per-function
 describe('fandl', () => {
   test('will update files in place', async () => {
     const testDirSrc = resolve(
