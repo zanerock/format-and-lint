@@ -11,7 +11,6 @@ import { myDirFromImport } from '../../test/lib/my-dir-from-import'
 
 const __dirname = myDirFromImport(import.meta.url)
 
-// eslint-disable-next-line max-lines-per-function
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
     const args = {
@@ -39,11 +38,14 @@ describe('formatAndLint', () => {
     testDir = resolve(__dirname, 'data', testDir)
     const testFile = resolve(testDir, 'index.mjs')
 
-    const results = await formatAndLint({ noWrite : true, files : [testFile] })
+    const { lintResults } = await formatAndLint({
+      noWrite : true,
+      files   : [testFile],
+    })
 
     const formattedFileContents = await getFormattedTextFor(testFile)
 
-    expect(results[0].output).toBe(formattedFileContents)
+    expect(lintResults[0].output).toBe(formattedFileContents)
   })
 
   test('will update files in place', async () => {
