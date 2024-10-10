@@ -146,6 +146,7 @@ In addition, fandl breaks up the eslint style and lint rules into various rule s
 - 'complexity': rules that check code complexity and encourage decomposing large functions and files into more manageable chunks
 - 'efficiency': rules that look for inefficient code, such as using `await` inside a loop
 - 'debug' : rules that look for debugging artifacts which should be removed before the final draft
+- 'node' : some node specific rules; this one is only included if `package.json` `engines.node` not `undefined` 
 - 'jsdoc': rules regarding JSDoc documentation
 - 'jsx': JSX specific rules
 - 'test': rules specific to to unit tests

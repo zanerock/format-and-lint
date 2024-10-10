@@ -41,6 +41,7 @@ const getEslintConfigEntry = ({ files = allFiles, ...configOptions }) => ({
   files,
   languageOptions : {
     sourceType,
+    globals       : {}, // make it easy for users to add using Object.assign()
     parser        : babelParser,
     parserOptions : {
       // yes, sourceType appears at both the languageOptions and parserOptinos level

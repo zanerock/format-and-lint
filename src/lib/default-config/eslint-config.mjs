@@ -223,11 +223,9 @@ const defaultDebug = getEslintConfigEntry({ rules : debugRules })
 
 const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
+let defaultNode = {}
 if (engines?.node !== undefined) {
-  defaultBaseConfig.plugins.node = fixupPluginRules(nodePlugin)
-  // TODO: actually, we don't want this for MJS files... but I'm not sure what we do want
-  defaultBaseConfig.languageOptions.globals = globalsPkg.node
-  Object.assign(defaultBaseConfig.rules, {
+  const nodeRules = {
     ...nodePlugin.configs.recommended.rules,
     'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
     'node/prefer-promises/dns'               : 'error',
@@ -237,23 +235,28 @@ if (engines?.node !== undefined) {
       {
         tryExtensions : allExts,
       },
-    ],
+    ]
+  }
+  defaultNode = getEslintConfigEntry({ 
+    plugins : { node : fixupPluginRules(nodePlugin) },
+    rules   : nodeRules
   })
+  Object.assign(defaultNode.languageOptions.globals, globalsPkg.node)
 }
 
-const defaultJsdocConfig = {
-  files   : allFiles,
+const jsdocRules = {
+  ...jsdocPlugin.configs['flat/recommended-error'].rules,
+  'jsdoc/require-description' : 'error',
+  // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
+  // e.g., func(foo = true)), but if this is possible, it's not working for us.
+  'jsdoc/no-defaults'         : 'off',
+  'jsdoc/check-tag-names'     : ['error', { definedTags : ['category'] }],
+}
+const defaultJsdocConfig = getEslintConfigEntry({
   ignores : [`**/index{${allExtsStr}}`, '**/__tests__/**/*', '**/*.test.*'],
   plugins : { jsdoc : jsdocPlugin },
-  rules   : {
-    ...jsdocPlugin.configs['flat/recommended-error'].rules,
-    'jsdoc/require-description' : 'error',
-    // there is some indication that jsdoc should be able to divine default from ES6 default parameter settings (
-    // e.g., func(foo = true)), but if this is possible, it's not working for us.
-    'jsdoc/no-defaults'         : 'off',
-    'jsdoc/check-tag-names'     : ['error', { definedTags : ['category'] }],
-  },
-}
+  rules   : jsdocRules,
+})
 
 const defaultJsxConfig = {
   files           : [`**/*{${jsxExtsStr}}`],
@@ -288,9 +291,10 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
     efficiency = 
       disable.includes('efficiency') ? undefined : defaultEfficiency,
     debug = disable.includes('debug') ? undefined : defaultDebug,
+    node = disable.includes('node') ? undefined : defaultNode,
+    jsdoc = disable.includes('jsdoc') ? undefined : defaultJsdocConfig,
     additional = {},
     base = defaultBaseConfig,
-    jsdoc = defaultJsdocConfig,
     jsx = defaultJsxConfig,
     test = defaultTestsConfig,
   } = ruleSets
@@ -326,8 +330,9 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
     complexity || {},
     efficiency || {},
     debug || {},
+    node || {},
+    jsdoc || {},
     base,
-    jsdoc,
     jsx,
     test,
     additional,
