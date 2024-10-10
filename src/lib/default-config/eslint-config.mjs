@@ -33,14 +33,58 @@ const plugins = Object.assign(
     import   : importPlugin,
     promise  : promisePlugin,
     n        : nPlugin,
-  },
-  stylisticConfig.plugins
-) // this names the plugin '@stylistic'
+  }
+)
 
 const rules = {
-  ...js.configs.recommended.rules,
-  ...standardPlugin.rules,
+  'import/export'                   : 'off',
+  // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
+  // which we need to import for react to work, even when not used
+  'no-unused-vars'                  : ['error', { varsIgnorePattern : 'React' }],
+  // style/consistency rules
+  // this modifies JS Standard style
+  'prefer-regex-literals'           : 'error',
+  'yoda'                            : ['error', 'never'],
+  // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
+  'no-console'                      : 'error',
+  // efficiency rules
+  'no-await-in-loop'                : 'error',
+  // rules for odd code/possible red flags/unintentional logic
+  'no-lonely-if'                    : 'error',
+  'no-return-assign'                : 'error',
+  'no-shadow'                       : 'error',
+  'no-extra-label'                  : 'error',
+  'no-label-var'                    : 'error',
+  'no-invalid-this'                 : 'error',
+  'no-unreachable-loop'             : 'error',
+  'no-extra-bind'                   : 'error',
+  'require-await'                   : 'error',
+  'consistent-return'               : 'error',
+  'default-case-last'               : 'error',
+  'eqeqeq'                          : 'error',
+  // limit code complexity
+  'complexity'                      : ['error', 20], // default val
+  'max-depth'                       : ['error', 4], // default val
+  'max-lines'                       : [
+    'error',
+    { max : 300, skipBlankLines : true, skipComments : true },
+  ], // default val,
+  'max-lines-per-function' : [
+    'error',
+    { max : 50, skipBlankLines : true, skipComments : true },
+  ],
+}
+
+const allFiles = [`**/*{${allExtsStr}}`]
+
+const defaultBaseRecommended = 
+  getEslintConfigEntry({ rules : js.configs.recommended.rules })
+
+const stylisticRules = {
   ...stylisticConfig.rules, // the stylistic rules also cover react rules
+  // this is actually the default in the code, but the docs say '1tbs' is the default, so we define it here for future 
+  // safety
+  '@stylistic/brace-style' : ['error', 'stroustrup', { allowSingleLine: true }],
   // override key spacing to get things aligned
   '@stylistic/key-spacing' : [
     'error',
@@ -56,16 +100,7 @@ const rules = {
   '@stylistic/arrow-parens'          : ['error', 'always'], // I like this to be consistent
   '@stylistic/array-bracket-newline' : ['error', 'consistent'],
   '@stylistic/array-element-newline' : ['error', 'consistent'],
-  '@stylistic/comma-dangle'          : [
-    'error',
-    {
-      arrays    : 'always-multiline',
-      objects   : 'always-multiline',
-      imports   : 'never',
-      exports   : 'never',
-      functions : 'never',
-    },
-  ],
+  '@stylistic/comma-dangle'          : ['error', 'always-multiline'],
   '@stylistic/function-call-argument-newline' : ['error', 'consistent'],
   '@stylistic/function-call-spacing'          : ['error', 'never'],
   '@stylistic/function-paren-newline'         : ['error', 'consistent'],
@@ -149,70 +184,31 @@ const rules = {
     { anonymous : 'always', asyncArrow : 'always', named : 'never' },
   ],
   '@stylistic/switch-colon-spacing' : ['error', { after : true, before : false }],
-  // one-true-brace-style /is/ the more common, but i just don't like it. I think Stroustrup is easier to read *and*,
-  // most important, with 1tbs, you can't do these kind of comments:
-  //
-  // if { ...
-  // } // I really like to be able to put comments here
-  // else if (some really conditional that means we'd have to put our comment inside the else-if!) {...}
-  //
-  // and I do those kind of comments sometime.
-  // 'standard/brace-style'    : ['errer', 'stroustrup', { allowSingleLine: true }],
-  'import/export'                   : 'off',
-  // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
-  // which we need to import for react to work, even when not used
-  'no-unused-vars'                  : ['error', { varsIgnorePattern : 'React' }],
-  // style/consistency rules
-  // this modifies JS Standard style
-  'prefer-regex-literals'           : 'error',
-  'yoda'                            : ['error', 'never'],
-  // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
-  'no-console'                      : 'error',
-  // efficiency rules
-  'no-await-in-loop'                : 'error',
-  // rules for odd code/possible red flags/unintentional logic
-  'no-lonely-if'                    : 'error',
-  'no-return-assign'                : 'error',
-  'no-shadow'                       : 'error',
-  'no-extra-label'                  : 'error',
-  'no-label-var'                    : 'error',
-  'no-invalid-this'                 : 'error',
-  'no-unreachable-loop'             : 'error',
-  'no-extra-bind'                   : 'error',
-  'require-await'                   : 'error',
-  'consistent-return'               : 'error',
-  'default-case-last'               : 'error',
-  'eqeqeq'                          : 'error',
-  // limit code complexity
-  'complexity'                      : ['error', 20], // default val
-  'max-depth'                       : ['error', 4], // default val
-  'max-lines'                       : [
-    'error',
-    { max : 300, skipBlankLines : true, skipComments : true },
-  ], // default val,
-  'max-lines-per-function' : [
-    'error',
-    { max : 50, skipBlankLines : true, skipComments : true },
-  ],
 }
 
-// OK, so the standard plugin provides lots of nice rules, but there are some conflicts, so we delete them (and let the
-// @stylistic rules control).
-delete rules['block-spacing'] // redundant with @stylistic
-delete rules['brace-style'] // they want 1tbs, we want stroustrup
-delete rules['comma-dangle'] // they so no, we say multiline
-delete rules['eol-last'] // redundant with @stylistic
-delete rules.indent
-delete rules['indent-binary-ops']
-delete rules['key-spacing'] // redundant with @stylistic
-delete rules['operator-linebreak'] // they say after, we say before
-delete rules['no-trailing-spaces'] // doesn't conflict, but it's redundant with @stylistic
-delete rules['space-before-function-paren'] // we override default and redundant anyway
-delete rules['@stylistic/indent-binary-ops'] // this is handled better by prettier
-// deprecated rules
-delete rules['quote-props']
+// binary ops indentation is better handled by prettier
+delete stylisticRules['@stylistic/indent-binary-ops']
 
-const allFiles = [`**/*{${allExtsStr}}`]
+const defaultStylistic = getEslintConfigEntry({
+  plugins: stylisticConfig.plugins, // names plugin '@stylistic'
+  rules: stylisticRules,
+})
+
+const standardRules = standardPlugin.rules
+// The standard rules have some overlap with the stylistic rules. We remove them to avoid conflict and double 
+// reporting. We prefer stylistic because it's supported directly be ESLint.
+delete standardRules['block-spacing'] // redundant with stylistic
+delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
+delete standardRules['comma-dangle'] // they so no, we say multiline
+delete standardRules['eol-last'] // redundant with @stylistic
+delete standardRules.indent // handled by prettier
+delete standardRules['indent-binary-ops'] // handled by prettier
+delete standardRules['key-spacing'] // we say align to colon, they do not
+delete standardRules['operator-linebreak'] // they say after, we say before
+delete standardRules['no-trailing-spaces'] // redundant with @stylistic
+delete standardRules['space-before-function-paren'] // redundant with our spec
+// deprecated rules
+delete standardRules['quote-props']
 
 const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
@@ -269,7 +265,11 @@ const getEslintConfig = ({
   disable = [],
   ruleSets = {},
 } = {}) => {
-  const { 
+  const {
+    'base-recommended': baseRecommended = disable.includes('base-recommended') 
+      ? {} 
+      : defaultBaseRecommended,
+    stylistic = disable.includes('stylistic') ? {} : defaultStylistic,
     additional = {}, 
     base = defaultBaseConfig, 
     jsdoc = defaultJsdocConfig, 
@@ -277,7 +277,7 @@ const getEslintConfig = ({
     test = defaultTestsConfig,
   } = ruleSets
 
-  const eslintConfig = [base, jsdoc, jsx, test, additional]
+  const eslintConfig = [baseRecommended, stylistic, base, jsdoc, jsx, test, additional]
 
   return eslintConfig
 }

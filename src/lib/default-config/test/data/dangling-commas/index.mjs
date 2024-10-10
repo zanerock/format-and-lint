@@ -1,21 +1,29 @@
+import {
+  getEslintConfig // should have comma
+} from '../../../eslint-config'
+
 // we expect dangling commas in data structures
-const foo = {
+const bar = {
   bar : 'blah' // should have comma!
 }
 
-const bar = [
+const baz = [
   1 // should have comma!
 ]
 
-// but not function decls
-const baz = (bing) => {
-  return bing
+const bing = (
+  bong // should have comma
+) => {
+  return bong
 }
 
-// or calls
-baz('blah')
+baz(
+  'blah' // should have comma
+)
 
-export {
-  foo,
-  bar // should NOT have comma
+export { // export stuff to avoid unused var error
+  getEslintConfig,
+  bar,
+  baz,
+  bing // should have comma
 }

@@ -15,7 +15,7 @@ describe('eslint-config.mjs', () => {
     [
       'detects missing dangling commas',
       'dangling-commas',
-      ['@stylistic/comma-dangle', '@stylistic/comma-dangle'],
+      Array(6).fill('@stylistic/comma-dangle'),
     ],
     [
       'detects Windows style newlines',
@@ -33,7 +33,7 @@ describe('eslint-config.mjs', () => {
     const results = await eslint.lintFiles(
       `src/lib/default-config/test/data/${testDir}/**/*`
     )
-
+    
     expect(results).toHaveLength(1)
     // do this first so we get info about the failed rules
     const failedRules = results[0].messages.map((m) => m.ruleId)

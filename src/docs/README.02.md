@@ -24,43 +24,66 @@ By default, fandl assumes that the input source files use ES6 module format. You
 
 ## Formatting overview
 
-- The code is run through prettier first mainly because it does a much better job properly indenting code and fitting it within a target width (80 chars).[^1]
-- The partially reformatted code is then reformatted by eslint because prettier (purposely) has very few options and we don't agree with all of them. Specifically, our out of the box configuration:
-  - places operators at the beginning of the next line rather than the end of the previous line in multi-line expressions; e.g.:
+The code is run through prettier first mainly because it does a much better job properly indenting code and fitting it within a target width (80 chars).[^1] The partially reformatted code is then formatted by eslint because prettier (purposely) has very few options and we don't agree with all of them. The eslint rules have been harmonized such that the final formatted code will pass a lint check.
+
+Our formatting differs from prettier and/or JS standard on the following points:
+- fandl places operators at the beginning of the next line rather than the end of the previous line in multi-line expressions (contrary to prettier); this improves readability; e.g.:
   ```js
-  const foo = bar // fandl style; generally accepted as easier to read
+  const foo = bar // fandl style
     && baz
   // vs
   const foo = bar && // prettier style
     baz
   ```
-  - places `else if`/`else`/`catch`, etc. on a newline; e.g.:
+- fandl places `else if`/`else`/`catch`, etc. on a newline, aka Stroustrup style (contrary to JS Standard and prettier); 1tbs can be harder to read (IMO) and Stroustrup allows for comments at the end of the block; e.g.:
   ```js
-  if (a === 1) { // fandl style (Stroustrup); more consistent and allows for end comments
+  if (a === 1) { // fandl style (Stroustrup)
     ...
   } // here we can say something about what the preceding block did
-  else { // and here we can say something about what this block will do
-
+  else if (a === 2 && b === 3) { // here we can say something about this block
+    ...
   }
   // vs
-  if (a === 1) { // prettier style ("one true brace style")
+  if (a === 1) { // JS Standard, prettier style ("one true brace style")
+    return 'visually, I find this harder to read when the else-if abuts'
+  } else if (a === 2 && b === 3) {
     ...
-  } /* I gess you could do this */ else { // but IDK, just looks weird
-
   }
   ```
-  - aligns the colons in object declarations; e.g.:
+- fandl aligns the colons in object declarations, making name/values easier to read (like a table); e.g.:
   ```js
-  { // fandl style; easier to read, like a table
+  const foo = { // fandl style
     foo           : 'hey',
     longFieldName : 'how are you?',
   }
   // vs
-  { // prettier style
+  const bar = { // JS Standard, prettier style
     foo : 'hey',
-    longFieldName : 'how are you?',
+    longFieldName : 'how are you?'
   }
   ```
-- The dual-formatting is also compatible with the eslint configuration, so the code final format will pass the eslint based lint checking.
+- fandl requires a dangling comma in multi-line array and object definitions as well as multi-line import and export statements[^2]; this makes diffs cleaner and it's easier/less error prone when making changes (contrary to JS Standard and prettier); e.g.:
+  ```js
+  // everyone agrees, no comma in single line
+  const foo = [ 'item one', 'item 2' ]
+  const bar = [ // fandl style
+    'item one',
+    'item two',
+  ]
+  // vs
+  const baz = [ // JS Standard, prettier style
+    'item one',
+    'item two'
+  ]
+  ```
+- fandl requires operators come at the start of a newline in multi-line expressions (aka, 'before' style) ; this is easier to read and is consistent with the ternary operator formatting which we all agree is 'before'; e.g.:
+  ```js
+  const foo = bar //fandl style
+    & baz
+  // vs
+  const bar = bing & // JS Standard, prettier style
+    bong
+  ```
 
 [^1]: I perhaps falsely remember eslint actually doing a better re indenting code, but in any case there are two issue with the latest eslint based reformatting. First, it miscounts the correct indention level where '('s were involved in boolean expressions. Second, eslint failed automatically break up long lines. (As of @stylistic/eslint-plugin: 2.6.4, eslint: 8.50.0; have since upgraded but not retested since it's working as is.)
+[^2]: Dangling commas are disallowed in function definition and calls, however. The reasoning here is that function calls need to be precise and the presence of a dangling ',' might in
