@@ -140,7 +140,7 @@ In addition, fandl breaks up the eslint style and lint rules into various rule s
 
 - 'base-recommended': ESlint's recommended [base rule set](https://www.npmjs.com/package/@eslint/js)
 - 'stylistic': ESlint's recommended [stylistic rule set](https://eslint.style/rules)
-- 'standardjs': the [Standard JS rules](https://standardjs.com/rules) (which are partially modified by the 'style' rules)
+- 'standard-js': the [Standard JS rules](https://standardjs.com/rules) (which are partially modified by the 'style' rules; see [formatting overview](#formatting-overview) for details)
 - 'style': additional and superseding style specific rules; refer to the [formatting overview](#formatting-overview) section for details on the default fandl style
 - 'smells': rules that may be indicative of possible logical errors or incomplete changes such as unused variables, use of the '===' operator in comparisons, consistent `return` values in a statement (naked or valued), etc.
 - 'complexity': rules that check code complexity and encourage decomposing large functions and files into more manageable chunks
@@ -149,6 +149,8 @@ In addition, fandl breaks up the eslint style and lint rules into various rule s
 - 'test': rules specific to to unit tests
 
 Rule sets can be individually overridden with the `--rule-sets-path` CLI option or the `ruleSets` option when using [`formatAndLint()`](#format-and-lint). Configurations associated with a novel key (not defined above) will be appended to the configuration array and augment the configuration. Rules sets may also be disabled with the `--disable-rule-sets` and `disableRuleSets` options respectively.
+
+Because there are some redundancies and conflicts in some of the stock rule sets, certain rules may be deleted or left in place depending on which rule sets are included. E.g., both 'standard-js' and 'stylistic' enforce a blank line at the end of a file so the 'standard-js' rule is deleted to avoid double reporting and 'style' aligns colons in multi-line object definitions so the corresponding 'standard-js' rule (which does not) is deleted. So, if you prefer Standard JS to our own default fandl style, you can simply disable 'style', and the would-be conflicting/redundant 'standard-js' rules will be left in place.
 
 ### Specifying source type
 

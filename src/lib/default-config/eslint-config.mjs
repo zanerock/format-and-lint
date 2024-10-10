@@ -87,20 +87,9 @@ const defaultStylistic = getEslintConfigEntry({
 })
 
 const standardRules = standardPlugin.rules
-// The standard rules have some overlap with the stylistic rules. We remove them to avoid conflict and double
-// reporting. We prefer stylistic because it's supported directly be ESLint.
-delete standardRules['block-spacing'] // redundant with stylistic
-delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
-delete standardRules['comma-dangle'] // they so no, we say multiline
-delete standardRules['eol-last'] // redundant with @stylistic
 delete standardRules.indent // handled by prettier
 delete standardRules['indent-binary-ops'] // handled by prettier
-delete standardRules['key-spacing'] // we say align to colon, they do not
-delete standardRules['operator-linebreak'] // they say after, we say before
-delete standardRules['no-trailing-spaces'] // redundant with @stylistic
-delete standardRules['space-before-function-paren'] // redundant with our spec
-// deprecated rules
-delete standardRules['quote-props']
+delete standardRules['quote-props'] // deprecated
 // the following two rules are present, but 'warn'
 standardRules['no-var'] = 'error'
 standardRules['object-shorthand'] = ['warn', 'properties']
@@ -274,13 +263,13 @@ const defaultTestsConfig = {
 const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
   const {
     'base-recommended': baseRecommended = disable.includes('base-recommended')
-      ? {}
+      ? undefined
       : defaultBaseRecommended,
-    stylistic = disable.includes('stylistic') ? {} : defaultStylistic,
+    stylistic = disable.includes('stylistic') ? undefined : defaultStylistic,
     'standard-js' : standardJs = disable.includes('standardjs') 
-      ? {} 
+      ? undefined
       : defaultStandardJs,
-    style = disable.includes('style') ? {} : defaultStyle,
+    style = disable.includes('style') ? undefined : defaultStyle,
     additional = {},
     base = defaultBaseConfig,
     jsdoc = defaultJsdocConfig,
@@ -288,11 +277,29 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
     test = defaultTestsConfig,
   } = ruleSets
 
+  if (standardJs !== undefined) {
+    if (stylistic !== undefined) {
+      // then we delete redundant rules that also appear in stylistic
+      delete standardRules['block-spacing']
+      delete standardRules['eol-last']
+      delete standardRules['no-trailing-spaces']
+    }
+    if (style !== undefined) {
+      // delete conflicts
+      delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
+      delete standardRules['comma-dangle'] // they so no, we say multiline
+      delete standardRules['key-spacing'] // we say align to colon, they do not
+      delete standardRules['operator-linebreak'] // they say after, we say before
+      // redundant
+      delete standardRules['space-before-function-paren']
+    }  
+  }
+
   const eslintConfig = [
-    baseRecommended,
-    stylistic,
-    standardJs,
-    style,
+    baseRecommended || {},
+    stylistic || {},
+    standardJs || {},
+    style || {},
     base,
     jsdoc,
     jsx,
