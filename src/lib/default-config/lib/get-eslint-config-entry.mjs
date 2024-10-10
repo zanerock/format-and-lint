@@ -29,7 +29,9 @@ const allFiles = [`**/*{${allExtsStr}}`]
  * set default 'files' (unless overridden), 'languageOptions', and 'settings'. The most common usage is to add a set of
  * 'rules' (and any necessary 'plugins'). File targets can be specified with 'files' and 'ignores'.
  * @param {object} options - The input options.
- * @param {string[]} [options.files = <all js/x files>] - An array of file patterns to match for this configuration.
+ * @param {string[]} [options.files = <all js/x files>] - An array of file patterns to match for this configuration. 
+ *   Note that when used with [`formatAndLint()`](#formatAndLint), `formatAndLint()` actually selects tho files for 
+ *   processing. This pattern is then used to determine whether to apply the configuration to a given file.
  *   Will default to match all '.js', '.cjs', '.mjs', and '.jsx'.
  * @param {...object} options.configOptions - Additional options to apply to the configuration. The most common entries
  *   will be 'ignores', rules', and 'plugin'.

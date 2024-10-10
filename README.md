@@ -82,7 +82,7 @@ to the an instance of [`ESLint`](https://eslint.org/docs/latest/integrate/nodejs
 points to an array of [`LintResult`](https://eslint.org/docs/latest/integrate/nodejs-api#-lintresult-type)s.
 
 <a id="getEslintConfigEntry"></a>
-### `getEslintConfigEntry(options)` ⇒ `object` <sup>↱<sup>[source code](./src/lib/default-config/lib/get-eslint-config-entry.mjs#L38)</sup></sup> <sup>⇧<sup>[global index](#global-function-index)</sup></sup>
+### `getEslintConfigEntry(options)` ⇒ `object` <sup>↱<sup>[source code](./src/lib/default-config/lib/get-eslint-config-entry.mjs#L40)</sup></sup> <sup>⇧<sup>[global index](#global-function-index)</sup></sup>
 
 Generates an ESlint flat style configuration entry using the fandl parser defaults and supplied settings. This will
 set default 'files' (unless overridden), 'languageOptions', and 'settings'. The most common usage is to add a set of
@@ -92,7 +92,7 @@ set default 'files' (unless overridden), 'languageOptions', and 'settings'. The 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | `options` | `object` |  | The input options. |
-| [`options.files`] | `Array.<string>` | `<all js/x files>` | An array of file patterns to match for this configuration.   Will default to match all '.js', '.cjs', '.mjs', and '.jsx'. |
+| [`options.files`] | `Array.<string>` | `<all js/x files>` | An array of file patterns to match for this configuration.    Note that when used with [`formatAndLint()`](#formatAndLint), `formatAndLint()` actually selects tho files for    processing. This pattern is then used to determine whether to apply the configuration to a given file.   Will default to match all '.js', '.cjs', '.mjs', and '.jsx'. |
 | ...`options.configOptions` | `object` |  | Additional options to apply to the configuration. The most common entries   will be 'ignores', rules', and 'plugin'. |
 
 **Returns**: `object` - A ESLint flat configuration entry.
