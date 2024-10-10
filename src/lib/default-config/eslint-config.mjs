@@ -33,6 +33,7 @@ const plugins = Object.assign({
 })
 
 const rules = {
+  // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
   'import/export'         : 'off',
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
   // which we need to import for react to work, even when not used
