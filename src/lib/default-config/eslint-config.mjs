@@ -35,16 +35,11 @@ const plugins = Object.assign({
 const rules = {
   // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
   'import/export'         : 'off',
-  // 'React' must be imported even if not directly used.
-  'no-unused-vars'        : ['error', { varsIgnorePattern : 'React' }],
   // style/consistency rules
   // this modifies Standard JS style
-  'prefer-regex-literals' : 'error',
+  // 'prefer-regex-literals' : 'error', uhh... no it doesn't
   // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
   'no-console'            : 'error',
-  // efficiency rules
-  'no-await-in-loop'      : 'error',
-  'require-await'         : 'error',
 }
 
 const allFiles = [`**/*{${allExtsStr}}`]
@@ -217,6 +212,13 @@ const complexityRules = {
 
 const defaultComplexity = getEslintConfigEntry({ rules : complexityRules })
 
+const efficiencyRules = {
+  'no-await-in-loop'      : 'error',
+  'require-await'         : 'error',
+}
+
+const defaultEfficiency = getEslintConfigEntry({ rules : efficiencyRules })
+
 const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
 if (engines?.node !== undefined) {
@@ -270,18 +272,19 @@ const defaultTestsConfig = {
 
 const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
   const {
-    'base-recommended': baseRecommended = disable.includes('base-recommended')
+    'base-recommended': baseRecommended = 
+      disable.includes('base-recommended')
       ? undefined
       : defaultBaseRecommended,
     stylistic = disable.includes('stylistic') ? undefined : defaultStylistic,
-    'standard-js' : standardJs = disable.includes('standardjs') 
-      ? undefined
-      : defaultStandardJs,
+    'standard-js' : standardJs =
+      disable.includes('standardjs') ? undefined : defaultStandardJs,
     style = disable.includes('style') ? undefined : defaultStyle,
     smells = disable.includes('smells') ? undefined : defaultSmells,
-    complexity = disable.includes('complexity') 
-      ? undefined 
-      : defaultComplexity,
+    complexity = 
+      disable.includes('complexity') ? undefined : defaultComplexity,
+    efficiency = 
+      disable.includes('efficiency') ? undefined : defaultEfficiency,
     additional = {},
     base = defaultBaseConfig,
     jsdoc = defaultJsdocConfig,
@@ -297,6 +300,10 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
       delete standardRules['no-trailing-spaces']
     }
     if (style !== undefined) {
+      // overrides
+      // 'React' must be imported even if not directly used; also, our no-unused-vars config is stricter
+      standardRules['no-unused-vars'] = 
+        ['error', { varsIgnorePattern : 'React' }]
       // delete conflicts
       delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
       delete standardRules['comma-dangle'] // they so no, we say multiline
@@ -314,6 +321,7 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
     style || {},
     smells || {},
     complexity || {},
+    efficiency || {},
     base,
     jsdoc,
     jsx,
