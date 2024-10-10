@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { ArgumentInvalidError } from 'standard-error-set'
 import { find } from 'find-plus'
 
-import { allExts } from '../default-config/js-extensions'
+import { allExts } from '../default-config/lib/js-extensions'
 import { processFilePatterns } from './process-file-patterns'
 import { processGitignore } from './process-gitignore'
 import { processPackageIgnores } from './process-package-ignores'

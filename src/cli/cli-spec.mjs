@@ -28,11 +28,6 @@ const lintArgs = [
       'Specifies the path to a eslint configuration file to replace the default base eslint configuration.',
   },
   {
-    name : 'eslint-config-components-path',
-    description :
-      "Specifies the path to a configuration file that resolves to an object keyed to 'base', 'jsx', 'node', and 'test' configuration components.",
-  },
-  {
     name : 'ignore-package-settings',
     type : Boolean,
     description :
@@ -47,6 +42,11 @@ const lintArgs = [
   {
     name        : 'root',
     description : 'The directory from which to start looking for files.',
+  },
+  {
+    name : 'rule-sets-path',
+    description :
+      "Specifies the path to a configuration file that resolves to an object keyed to 'base', 'jsx', 'node', and 'test' configuration components.",
   },
 ]
 

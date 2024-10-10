@@ -3,16 +3,16 @@ import { ArgumentInvalidError } from 'standard-error-set'
 
 import { getEslintConfig } from '../default-config/eslint-config'
 
-const getEslint = ({ check, eslintConfig, eslintConfigComponents }) => {
-  if (eslintConfig !== undefined && eslintConfigComponents !== undefined) {
+const getEslint = ({ check, eslintConfig, ruleSets }) => {
+  if (eslintConfig !== undefined && ruleSets !== undefined) {
     throw new ArgumentInvalidError({
       message :
-        "You cannot define 'eslintConfig' and 'eslintConfigComponents' simultaneously.",
+        "You cannot define 'eslintConfig' and 'ruleSets' simultaneously.",
     })
   }
 
   if (eslintConfig === undefined) {
-    eslintConfig = getEslintConfig(eslintConfigComponents)
+    eslintConfig = getEslintConfig(ruleSets)
   }
 
   return new ESLint({

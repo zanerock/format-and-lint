@@ -8,8 +8,10 @@ Pre-configured formatting and lint tool combining the best of prettier and eslin
   - [CLI](#cli)
   - [API](#api)
 - [API reference](#api-reference)
-- [Component based configuration](#component-based-configuration)
-- [Reformatting process overview](#reformatting-process-overview)
+- [Customizing lint and style](#customizing-lint-and-style)
+  - [Overriding lint and style rules](#overriding-lint-and-style-rules)
+  - [Specifying source type](#specifying-source-type)
+- [Formatting overview](#formatting-overview)
 
 ## Install
 

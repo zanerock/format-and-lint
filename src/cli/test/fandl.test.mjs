@@ -55,13 +55,13 @@ describe('fandl', () => {
     }
   })
 
-  test("raises error if both '--eslint-config-path' and '--eslint-config-components-path' are specified", async () => {
+  test("raises error if both '--eslint-config-path' and '--rule-sets-path' are specified", async () => {
     try {
       await fandl({
         argv : [
           '--eslint-config-path',
           '/foo',
-          '--eslint-config-components-path',
+          '--rule-sets-path',
           '/foo',
         ],
       })

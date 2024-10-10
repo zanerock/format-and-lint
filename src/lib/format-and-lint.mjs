@@ -19,15 +19,15 @@ import { prettierConfig as defaultPrettierConfig } from './default-config/pretti
  *   always present on the `LintResult` object (rather than only being set if the text is changed.
  * @param {object} [options.eslintConfig = <default eslint config>] - A flat (9.x) style array of [eslint configuration
  *   object](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects) to be used in
- *   place of the default, out of the box configuration. This may not be specified along with `eslintConfigComponents`.
- * @param {object} [options.eslintConfigComponents = undefined] - An object with zero or more keys corresponding to the
- *   `base`, `jsdoc`, `jsx`, `test`, or `additional` as discussed in the [component based
- *   configuration](#component-based-configuration). This may not be specified along with `eslintConfig`.
+ *   place of the default, out of the box configuration. This may not be specified along with `ruleSets`.
+ * @param {object} [options.ruleSets = undefined] - An object with zero or more keys whose values are a valid ESlint 
+ *   "flat" configuration. Keys corresponding to the [standard fandl rule sets](#rule-sets) will override the named 
+ *   rule set. Any additional rule will be appended to the configuration array.
  * @param {object} [options.prettierConfig = <default prettier config>] - A prettier [options
  *   object](https://prettier.io/docs/en/options).
  * @param {object} [options.eslint = undefined] - A pre-configured
  *   [`ESLint`](https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class) instance. If this is defined, then
- *   `eslintConfig` and `eslintConfigComponents` will be ignored.
+ *   `eslintConfig` and `ruleSets` will be ignored.
  * @param {string} [options.outputDir = undefined] - If provided, then output files (whether reformatted or not) will be
  *   written to the specified directory relative to their location in the source. With `src/index.mjs` =>
  *   `<outputDir>/src/index.mjs`, `src/foo/bar.mjs` => `<outputDir>/src/foo/bar.mjs`. This option has no effect if
@@ -44,8 +44,8 @@ const formatAndLint = async (options) => {
     // see 'processSource' for additional options
     check = false,
     eslintConfig,
-    eslintConfigComponents,
     prettierConfig = defaultPrettierConfig,
+    ruleSets,
   } = options
 
   if (options.files === undefined || options.files.length === 0) {
@@ -65,7 +65,7 @@ const formatAndLint = async (options) => {
     processOptions.eslint = getEslint({
       check,
       eslintConfig,
-      eslintConfigComponents,
+      ruleSets,
     })
   }
 

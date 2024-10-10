@@ -1,20 +1,28 @@
-## Component based configuration
+## Customizing lint and style
 
-Fandl breaks up the configuration into 5 components:
-- 'base' which applies to all Javascript src files,
-- 'jsdoc' which defines JSDoc specific configuration and rules for all src files,
-- 'jsx' which defines additional configuration and rules for JSX files,
-- 'test' which defines additional configuration and rules for test files, and
-- 'additional' which is just a catch all for whatever else you might want to add.
+You can override the prettier and enlint rules using the `--prettier-config-path` and `--eslint-config-path` options when using the `fandl` command, or `prettierConfig` and `eslintConfig` options when using the [`formatAndLint()`](#formatAndLint) function. When the ESlint configuration is specified in this manner, then the 
 
-Rather than being forced to redefine the entire default configuration, you can override any one of the components individually by specifying `options.eslintConfigComponents`.
+### Rule sets
 
-Note, the component structure is essentially a prototype at this point. Future versions will:
-- Break up 'base' (which is very large) into different semantic types such "correctness", "complexity", and "style".
-- Support arbitrary additional configuration components.
-- Support turning off individual configuration components.
+In addition, fandl breaks up the eslint style and lint rules into various rule sets. All rule sets are included by default. The rule sets are:
 
-## Reformatting process overview
+- 'base-recommended': ESlint's recommended [base rule set](https://www.npmjs.com/package/@eslint/js)
+- 'stylistic': ESlint's recommended [stylistic rule set](https://eslint.style/rules)
+- 'standardjs': the [Standard JS rules](https://standardjs.com/rules) (which are partially modified by the 'style' rules)
+- 'style': additional and superseding style specific rules; refer to the [formatting overview](#formatting-overview) section for details on the default fandl style
+- 'smells': rules that may be indicative of possible logical errors or incomplete changes such as unused variables, use of the '===' operator in comparisons, consistent `return` values in a statement (naked or valued), etc.
+- 'complexity': rules that check code complexity and encourage decomposing large functions and files into more manageable chunks
+- 'jsdoc': rules regarding JSDoc documentation
+- 'jsx': JSX specific rules
+- 'test': rules specific to to unit tests
+
+Rule sets can be individually overridden with the `--rule-sets-path` CLI option or the `ruleSets` option when using [`formatAndLint()`](#format-and-lint). Configurations associated with a novel key (not defined above) will be appended to the configuration array and augment the configuration. Rules sets may also be disabled with the `--disable-rule-sets` and `disableRuleSets` options respectively.
+
+### Specifying source type
+
+By default, fandl assumes that the input source files use ES6 module format. You can override this in two ways. First, in your `package.json`, you can set `pkgdev['format-and-lint'].sourceType`, which if present, determines the source file format. If the `pkgdev` setting is not present, then fandl examines the `type` field in `package.json` and uses that value. Note that if the distributed format is "commonjs", and this is specified as `"type": "commonjs"` `package.json`, but the source files use "module" format (and then are transpiled by Babel or similar), you _must_ set the `pkgdev['format-and-lint'].sourceType` field to "module".
+
+## Formatting overview
 
 - The code is run through prettier first mainly because it does a much better job properly indenting code and fitting it within a target width (80 chars).[^1]
 - The partially reformatted code is then reformatted by eslint because prettier (purposely) has very few options and we don't agree with all of them. Specifically, our out of the box configuration:

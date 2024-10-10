@@ -8,51 +8,21 @@
  * Our one exception to the standard style is implementing aligned colons on multiline
  * 'key-spacing'. We think it makes things more readable. We also add a preference for regex literals where possible.
  */
-import { existsSync, readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
 import globalsPkg from 'globals'
 import importPlugin from 'eslint-plugin-import'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
 import nodePlugin from 'eslint-plugin-node'
 import promisePlugin from 'eslint-plugin-promise'
 import nPlugin from 'eslint-plugin-n'
-import babelParser from '@babel/eslint-parser'
 import { fixupPluginRules } from '@eslint/compat'
 import js from '@eslint/js'
 import stylistic from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
+import { getEslintConfigEntry } from './lib/get-eslint-config-entry'
 import { linebreakTypesExcept } from './lib/linebreak-types-except'
-import { allExts, allExtsStr, jsxExtsStr } from './js-extensions'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-const babelConfigPathInstalled = join(__dirname, 'babel', 'babel.config.cjs')
-const babelConfigPathTest = join('dist', 'babel', 'babel.config.cjs')
-
-const babelConfigPath =
-  existsSync(babelConfigPathInstalled) === true
-    ? babelConfigPathInstalled
-    : existsSync(babelConfigPathTest)
-      ? babelConfigPathTest
-      : undefined
-if (babelConfigPath === undefined) {
-  throw new Error('Could not find babel config file.')
-}
-
-const packageContents = readFileSync('./package.json', { encoding : 'utf8' })
-const packageJSON = JSON.parse(packageContents)
-const {
-  dependencies = {},
-  devDependencies = {},
-  engines = { node : true },
-} = packageJSON
-
-const usesReact =
-  dependencies.react !== undefined || devDependencies.react !== undefined
-const reactSettings = usesReact ? { version : 'detect' } : {}
+import { allExts, allExtsStr, jsxExtsStr } from './lib/js-extensions'
+import { engines, reactSettings } from './lib/package-settings'
 
 const stylisticConfig = stylistic.configs['recommended-flat']
 
@@ -188,7 +158,6 @@ const rules = {
   //
   // and I do those kind of comments sometime.
   // 'standard/brace-style'    : ['errer', 'stroustrup', { allowSingleLine: true }],
-  // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
   'import/export'                   : 'off',
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
   // which we need to import for react to work, even when not used
@@ -245,22 +214,7 @@ delete rules['quote-props']
 
 const allFiles = [`**/*{${allExtsStr}}`]
 
-const defaultBaseConfig = {
-  files           : allFiles,
-  languageOptions : {
-    parser        : babelParser,
-    parserOptions : {
-      sourceType        : 'module',
-      requireConfigFile : true,
-      babelOptions      : { configFile : babelConfigPath },
-      ecmaFeatures      : { jsx : true },
-    },
-    ecmaVersion : 'latest',
-  },
-  settings : { react : reactSettings },
-  plugins,
-  rules,
-}
+const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
 if (engines?.node !== undefined) {
   defaultBaseConfig.plugins.node = fixupPluginRules(nodePlugin)
@@ -298,6 +252,7 @@ const defaultJsxConfig = {
   files           : [`**/*{${jsxExtsStr}}`],
   // add necessary globals when processing JSX files
   languageOptions : { globals : globalsPkg.browser },
+  settings : { react : reactSettings },
 }
 
 const defaultTestsConfig = {
@@ -311,12 +266,17 @@ const defaultTestsConfig = {
 }
 
 const getEslintConfig = ({
-  additional = {},
-  base = defaultBaseConfig,
-  jsdoc = defaultJsdocConfig,
-  jsx = defaultJsxConfig,
-  test = defaultTestsConfig,
+  disable = [],
+  ruleSets = {},
 } = {}) => {
+  const { 
+    additional = {}, 
+    base = defaultBaseConfig, 
+    jsdoc = defaultJsdocConfig, 
+    jsx = defaultJsxConfig, 
+    test = defaultTestsConfig,
+  } = ruleSets
+
   const eslintConfig = [base, jsdoc, jsx, test, additional]
 
   return eslintConfig

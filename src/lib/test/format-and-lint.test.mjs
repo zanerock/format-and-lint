@@ -12,11 +12,11 @@ import { myDirFromImport } from '../../test/lib/my-dir-from-import'
 const __dirname = myDirFromImport(import.meta.url)
 
 describe('formatAndLint', () => {
-  test("raises error if 'eslintConfig' and 'eslintConfigComponents' defined", async () => {
+  test("raises error if 'eslintConfig' and 'ruleSets' defined", async () => {
     const args = {
       check                  : true,
       eslintConfig           : [],
-      eslintConfigComponents : [],
+      ruleSets : [],
       files                  : ['foo.js'],
     }
     try {

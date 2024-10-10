@@ -21,7 +21,7 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
     const {
       // see 'selectFilesFromOptions' for additional options processed by fandl
       eslintConfigPath,
-      eslintConfigComponentsPath,
+      ruleSetsPath,
       prettierConfigPath,
       ...remainderOptions
     } = options
@@ -38,9 +38,9 @@ const fandl = async ({ argv = process.argv, stdout = process.stdout } = {}) => {
         : await processConfigFile(eslintConfigPath)
 
     const eslintComfigComponents =
-      eslintConfigComponentsPath === undefined
+      ruleSetsPath === undefined
         ? undefined
-        : await processConfigFile(eslintConfigComponentsPath)
+        : await processConfigFile(ruleSetsPath)
 
     const prettierConfig =
       prettierConfigPath === undefined
@@ -85,14 +85,14 @@ const extractFormatOrLintOptions = (command, mainOpts) =>
       )
     )
 
-const verifyArgs = ({ eslintConfigPath, eslintConfigComponentsPath }) => {
+const verifyArgs = ({ eslintConfigPath, ruleSetsPath }) => {
   if (
     eslintConfigPath !== undefined
-    && eslintConfigComponentsPath !== undefined
+    && ruleSetsPath !== undefined
   ) {
     throw new ArgumentInvalidError({
       message :
-        "Specifying both '--eslint-config-path' and '--eslint-config-components-path' is invalid. Please specify one or the other.",
+        "Specifying both '--eslint-config-path' and '--rule-sets-path' is invalid. Please specify one or the other.",
     })
   }
 }
