@@ -13,6 +13,7 @@ In addition, fandl breaks up the eslint style and lint rules into various rule s
 - 'smells': rules that may be indicative of possible logical errors or incomplete changes such as unused variables, use of the '===' operator in comparisons, consistent `return` values in a statement (naked or valued), etc.
 - 'complexity': rules that check code complexity and encourage decomposing large functions and files into more manageable chunks
 - 'efficiency': rules that look for inefficient code, such as using `await` inside a loop
+- 'debug' : rules that look for debugging artifacts which should be removed before the final draft
 - 'jsdoc': rules regarding JSDoc documentation
 - 'jsx': JSX specific rules
 - 'test': rules specific to to unit tests

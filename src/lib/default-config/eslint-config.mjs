@@ -38,8 +38,6 @@ const rules = {
   // style/consistency rules
   // this modifies Standard JS style
   // 'prefer-regex-literals' : 'error', uhh... no it doesn't
-  // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
-  'no-console'            : 'error',
 }
 
 const allFiles = [`**/*{${allExtsStr}}`]
@@ -175,7 +173,6 @@ const styleRules = {
   '@stylistic/switch-colon-spacing' : ['error', { after : true, before : false }],
   'yoda'                            : ['error', 'never'],
 }
-
 const defaultStyle = getEslintConfigEntry({
   plugins : stylisticConfig.plugins, // names plugin '@stylistic'
   rules: styleRules,
@@ -194,7 +191,6 @@ const smellsRules = {
   'default-case-last'     : 'error',
   'eqeqeq'                : 'error',
 }
-
 const defaultSmells = getEslintConfigEntry({ rules: smellsRules })
 
 const complexityRules = {
@@ -209,15 +205,21 @@ const complexityRules = {
     { max : 50, skipBlankLines : true, skipComments : true },
   ],
 }
-
 const defaultComplexity = getEslintConfigEntry({ rules : complexityRules })
 
 const efficiencyRules = {
   'no-await-in-loop'      : 'error',
   'require-await'         : 'error',
 }
-
 const defaultEfficiency = getEslintConfigEntry({ rules : efficiencyRules })
+
+const debugRules = {
+  'no-debugger' : 'error',
+  // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
+  'no-console'  : 'error',
+  'no-alert'    : 'error',
+}
+const defaultDebug = getEslintConfigEntry({ rules : debugRules })
 
 const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
@@ -285,6 +287,7 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
       disable.includes('complexity') ? undefined : defaultComplexity,
     efficiency = 
       disable.includes('efficiency') ? undefined : defaultEfficiency,
+    debug = disable.includes('debug') ? undefined : defaultDebug,
     additional = {},
     base = defaultBaseConfig,
     jsdoc = defaultJsdocConfig,
@@ -322,6 +325,7 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
     smells || {},
     complexity || {},
     efficiency || {},
+    debug || {},
     base,
     jsdoc,
     jsx,
