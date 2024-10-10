@@ -35,41 +35,16 @@ const plugins = Object.assign({
 const rules = {
   // TODO; looks like it's failing on the `export * from './foo'` statements; even though we have the babel pluggin`
   'import/export'         : 'off',
-  // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
-  // which we need to import for react to work, even when not used
+  // 'React' must be imported even if not directly used.
   'no-unused-vars'        : ['error', { varsIgnorePattern : 'React' }],
   // style/consistency rules
   // this modifies Standard JS style
   'prefer-regex-literals' : 'error',
-  'yoda'                  : ['error', 'never'],
   // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
   'no-console'            : 'error',
   // efficiency rules
   'no-await-in-loop'      : 'error',
-  // rules for odd code/possible red flags/unintentional logic
-  'no-lonely-if'          : 'error',
-  'no-return-assign'      : 'error',
-  'no-shadow'             : 'error',
-  'no-extra-label'        : 'error',
-  'no-label-var'          : 'error',
-  'no-invalid-this'       : 'error',
-  'no-unreachable-loop'   : 'error',
-  'no-extra-bind'         : 'error',
   'require-await'         : 'error',
-  'consistent-return'     : 'error',
-  'default-case-last'     : 'error',
-  'eqeqeq'                : 'error',
-  // limit code complexity
-  'complexity'            : ['error', 20], // default val
-  'max-depth'             : ['error', 4], // default val
-  'max-lines'             : [
-    'error',
-    { max : 300, skipBlankLines : true, skipComments : true },
-  ], // default val,
-  'max-lines-per-function' : [
-    'error',
-    { max : 50, skipBlankLines : true, skipComments : true },
-  ],
 }
 
 const allFiles = [`**/*{${allExtsStr}}`]
@@ -203,12 +178,44 @@ const styleRules = {
     { anonymous : 'always', asyncArrow : 'always', named : 'never' },
   ],
   '@stylistic/switch-colon-spacing' : ['error', { after : true, before : false }],
+  'yoda'                            : ['error', 'never'],
 }
 
 const defaultStyle = getEslintConfigEntry({
   plugins : stylisticConfig.plugins, // names plugin '@stylistic'
   rules: styleRules,
 })
+
+const smellsRules = {
+  'no-lonely-if'          : 'error',
+  'no-return-assign'      : 'error',
+  'no-shadow'             : 'error',
+  'no-extra-label'        : 'error',
+  'no-label-var'          : 'error',
+  'no-invalid-this'       : 'error',
+  'no-unreachable-loop'   : 'error',
+  'no-extra-bind'         : 'error',
+  'consistent-return'     : 'error',
+  'default-case-last'     : 'error',
+  'eqeqeq'                : 'error',
+}
+
+const defaultSmells = getEslintConfigEntry({ rules: smellsRules })
+
+const complexityRules = {
+  'complexity'            : ['error', 20], // default val
+  'max-depth'             : ['error', 4], // default val
+  'max-lines'             : [
+    'error',
+    { max : 300, skipBlankLines : true, skipComments : true },
+  ], // default val,
+  'max-lines-per-function' : [
+    'error',
+    { max : 50, skipBlankLines : true, skipComments : true },
+  ],
+}
+
+const defaultComplexity = getEslintConfigEntry({ rules : complexityRules })
 
 const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
@@ -271,6 +278,10 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
       ? undefined
       : defaultStandardJs,
     style = disable.includes('style') ? undefined : defaultStyle,
+    smells = disable.includes('smells') ? undefined : defaultSmells,
+    complexity = disable.includes('complexity') 
+      ? undefined 
+      : defaultComplexity,
     additional = {},
     base = defaultBaseConfig,
     jsdoc = defaultJsdocConfig,
@@ -301,6 +312,8 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
     stylistic || {},
     standardJs || {},
     style || {},
+    smells || {},
+    complexity || {},
     base,
     jsdoc,
     jsx,
