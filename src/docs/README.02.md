@@ -8,7 +8,7 @@ In addition, fandl breaks up the eslint style and lint rules into various rule s
 
 - 'base-recommended': ESlint's recommended [base rule set](https://www.npmjs.com/package/@eslint/js)
 - 'stylistic': ESlint's recommended [stylistic rule set](https://eslint.style/rules)
-- 'standardjs': the [Standard JS rules](https://standardjs.com/rules) (which are partially modified by the 'style' rules)
+- 'standard-js': the [Standard JS rules](https://standardjs.com/rules) (which are partially modified by the 'style' rules; see [formatting overview](#formatting-overview) for details)
 - 'style': additional and superseding style specific rules; refer to the [formatting overview](#formatting-overview) section for details on the default fandl style
 - 'smells': rules that may be indicative of possible logical errors or incomplete changes such as unused variables, use of the '===' operator in comparisons, consistent `return` values in a statement (naked or valued), etc.
 - 'complexity': rules that check code complexity and encourage decomposing large functions and files into more manageable chunks
@@ -35,7 +35,7 @@ Our formatting differs from prettier and/or JS standard on the following points:
   const foo = bar && // prettier style
     baz
   ```
-- fandl places `else if`/`else`/`catch`, etc. on a newline, aka Stroustrup style (contrary to JS Standard and prettier); 1tbs can be harder to read (IMO) and Stroustrup allows for comments at the end of the block; e.g.:
+- fandl places `else if`/`else`/`catch`, etc. on a newline, aka Stroustrup style (contrary to Standard JS and prettier); 1tbs can be harder to read (IMO) and Stroustrup allows for comments at the end of the block; e.g.:
   ```js
   if (a === 1) { // fandl style (Stroustrup)
     ...
@@ -44,7 +44,7 @@ Our formatting differs from prettier and/or JS standard on the following points:
     ...
   }
   // vs
-  if (a === 1) { // JS Standard, prettier style ("one true brace style")
+  if (a === 1) { // Standard JS, prettier style ("one true brace style")
     return 'visually, I find this harder to read when the else-if abuts'
   } else if (a === 2 && b === 3) {
     ...
@@ -57,12 +57,12 @@ Our formatting differs from prettier and/or JS standard on the following points:
     longFieldName : 'how are you?',
   }
   // vs
-  const bar = { // JS Standard, prettier style
+  const bar = { // Standard JS, prettier style
     foo : 'hey',
     longFieldName : 'how are you?'
   }
   ```
-- fandl requires a dangling comma in multi-line array and object definitions as well as multi-line import and export statements[^2]; this makes diffs cleaner and it's easier/less error prone when making changes (contrary to JS Standard and prettier); e.g.:
+- fandl requires a dangling comma in multi-line array and object definitions as well as multi-line import and export statements[^2]; this makes diffs cleaner and it's easier/less error prone when making changes (contrary to Standard JS and prettier); e.g.:
   ```js
   // everyone agrees, no comma in single line
   const foo = [ 'item one', 'item 2' ]
@@ -71,7 +71,7 @@ Our formatting differs from prettier and/or JS standard on the following points:
     'item two',
   ]
   // vs
-  const baz = [ // JS Standard, prettier style
+  const baz = [ // Standard JS, prettier style
     'item one',
     'item two'
   ]
@@ -81,7 +81,7 @@ Our formatting differs from prettier and/or JS standard on the following points:
   const foo = bar //fandl style
     & baz
   // vs
-  const bar = bing & // JS Standard, prettier style
+  const bar = bing & // Standard JS, prettier style
     bong
   ```
 

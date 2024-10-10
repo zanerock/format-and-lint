@@ -27,8 +27,6 @@ import { engines, reactSettings } from './lib/package-settings'
 const stylisticConfig = stylisticPlugin.configs['recommended-flat']
 
 const plugins = Object.assign({
-  // the 'standard' rules plugins
-  standard : standardPlugin,
   import   : importPlugin,
   promise  : promisePlugin,
   n        : nPlugin,
@@ -40,7 +38,7 @@ const rules = {
   // which we need to import for react to work, even when not used
   'no-unused-vars'        : ['error', { varsIgnorePattern : 'React' }],
   // style/consistency rules
-  // this modifies JS Standard style
+  // this modifies Standard JS style
   'prefer-regex-literals' : 'error',
   'yoda'                  : ['error', 'never'],
   // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
@@ -79,8 +77,40 @@ const defaultBaseRecommended = getEslintConfigEntry({
   rules : js.configs.recommended.rules,
 })
 
-const stylisticRules = {
-  ...stylisticConfig.rules, // the stylistic rules also cover react rules
+const stylisticRules = Object.assign({}, stylisticConfig.rules)
+// binary ops indentation is better handled by prettier
+delete stylisticRules['@stylistic/indent-binary-ops']
+
+const defaultStylistic = getEslintConfigEntry({
+  plugins : stylisticConfig.plugins, // names plugin '@stylistic'
+  rules   : stylisticRules, // includes React rules
+})
+
+const standardRules = standardPlugin.rules
+// The standard rules have some overlap with the stylistic rules. We remove them to avoid conflict and double
+// reporting. We prefer stylistic because it's supported directly be ESLint.
+delete standardRules['block-spacing'] // redundant with stylistic
+delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
+delete standardRules['comma-dangle'] // they so no, we say multiline
+delete standardRules['eol-last'] // redundant with @stylistic
+delete standardRules.indent // handled by prettier
+delete standardRules['indent-binary-ops'] // handled by prettier
+delete standardRules['key-spacing'] // we say align to colon, they do not
+delete standardRules['operator-linebreak'] // they say after, we say before
+delete standardRules['no-trailing-spaces'] // redundant with @stylistic
+delete standardRules['space-before-function-paren'] // redundant with our spec
+// deprecated rules
+delete standardRules['quote-props']
+// the following two rules are present, but 'warn'
+standardRules['no-var'] = 'error'
+standardRules['object-shorthand'] = ['warn', 'properties']
+
+const defaultStandardJs = getEslintConfigEntry({
+  plugins : { standard : standardPlugin },
+  rules   : standardRules,
+})
+
+const styleRules = {
   // this is actually the default in the code, but the docs say '1tbs' is the default, so we define it here for future
   // safety
   '@stylistic/brace-style' : ['error', 'stroustrup', { allowSingleLine : true }],
@@ -185,29 +215,10 @@ const stylisticRules = {
   '@stylistic/switch-colon-spacing' : ['error', { after : true, before : false }],
 }
 
-// binary ops indentation is better handled by prettier
-delete stylisticRules['@stylistic/indent-binary-ops']
-
-const defaultStylistic = getEslintConfigEntry({
+const defaultStyle = getEslintConfigEntry({
   plugins : stylisticConfig.plugins, // names plugin '@stylistic'
-  rules   : stylisticRules,
+  rules: styleRules,
 })
-
-const standardRules = standardPlugin.rules
-// The standard rules have some overlap with the stylistic rules. We remove them to avoid conflict and double
-// reporting. We prefer stylistic because it's supported directly be ESLint.
-delete standardRules['block-spacing'] // redundant with stylistic
-delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
-delete standardRules['comma-dangle'] // they so no, we say multiline
-delete standardRules['eol-last'] // redundant with @stylistic
-delete standardRules.indent // handled by prettier
-delete standardRules['indent-binary-ops'] // handled by prettier
-delete standardRules['key-spacing'] // we say align to colon, they do not
-delete standardRules['operator-linebreak'] // they say after, we say before
-delete standardRules['no-trailing-spaces'] // redundant with @stylistic
-delete standardRules['space-before-function-paren'] // redundant with our spec
-// deprecated rules
-delete standardRules['quote-props']
 
 const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 
@@ -266,6 +277,10 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
       ? {}
       : defaultBaseRecommended,
     stylistic = disable.includes('stylistic') ? {} : defaultStylistic,
+    'standard-js' : standardJs = disable.includes('standardjs') 
+      ? {} 
+      : defaultStandardJs,
+    style = disable.includes('style') ? {} : defaultStyle,
     additional = {},
     base = defaultBaseConfig,
     jsdoc = defaultJsdocConfig,
@@ -276,6 +291,8 @@ const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
   const eslintConfig = [
     baseRecommended,
     stylistic,
+    standardJs,
+    style,
     base,
     jsdoc,
     jsx,

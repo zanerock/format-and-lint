@@ -31,7 +31,7 @@ describe('formatAndLint', () => {
   const formatTests = [
     ['handles prettier only formatting', 'basic-indent'],
     ['formats boolean operators in if statement', 'boolean-ops'],
-    ['allows no-brace one liners and requires 1tbs otherwise', 'brace-style'],
+    ['allows no-brace one liners and requires stroustrup otherwise', 'brace-style'],
     ['places required semicolon first', 'necessary-semicolon'],
   ]
 

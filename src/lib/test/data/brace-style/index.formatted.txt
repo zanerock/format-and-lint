@@ -1,4 +1,4 @@
-var x
+let x
 
 if (process.argv[0] === true) x = true
 else x = false
