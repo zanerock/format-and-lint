@@ -26,7 +26,7 @@ const copyDirToTmp = async (dir, findOptions) => {
       (async () => {
         await fs.mkdir(path.dirname(targetPath), { recursive : true })
         await fs.copyFile(srcFile, targetPath)
-      })()
+      })(),
     )
   }
 

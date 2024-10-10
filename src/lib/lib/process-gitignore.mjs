@@ -9,7 +9,7 @@ const processGitignore = ({ path = '.gitignore', warnOnNotIgnore }) => {
         ? (pattern) => {
             if (pattern.charAt(0) !== '!') {
               process.stderr.write(
-                `Negated '.gitignore' pattern '${pattern}' will be ignored.`
+                `Negated '.gitignore' pattern '${pattern}' will be ignored.`,
               )
             }
           }

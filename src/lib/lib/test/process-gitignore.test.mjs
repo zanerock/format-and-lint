@@ -47,7 +47,7 @@ describe('processGitignore', () => {
     }
     catch (e) {
       expect(e.message).toMatch(
-        /'.gitignore' contains un-usable negative ignore pattern\./
+        /'.gitignore' contains un-usable negative ignore pattern\./,
       )
     }
   })

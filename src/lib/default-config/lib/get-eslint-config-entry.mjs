@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -25,33 +25,32 @@ if (babelConfigPath === undefined) {
 const allFiles = [`**/*{${allExtsStr}}`]
 
 /**
- * Generates an ESlint flat style configuration entry using the fandl parser defaults and supplied settings. This will 
- * set default 'files' (unless overridden), 'languageOptions', and 'settings'. The most common usage is to add a set of 
+ * Generates an ESlint flat style configuration entry using the fandl parser defaults and supplied settings. This will
+ * set default 'files' (unless overridden), 'languageOptions', and 'settings'. The most common usage is to add a set of
  * 'rules' (and any necessary 'plugins'). File targets can be specified with 'files' and 'ignores'.
- * @param {Object} options - The input options.
- * @param {string[]} [options.files = <all js/x files>] - An array of file patterns to match for this configuration. 
+ * @param {object} options - The input options.
+ * @param {string[]} [options.files = <all js/x files>] - An array of file patterns to match for this configuration.
  *   Will default to match all '.js', '.cjs', '.mjs', and '.jsx'.
- * @param (...Object} options.configOptions - Additional options to apply to the configuration. The most common entries 
+ * @param {...object} options.configOptions - Additional options to apply to the configuration. The most common entries
  *   will be 'ignores', rules', and 'plugin'.
+ * @returns {object} A ESLint flat configuration entry.
  */
-const getEslintConfigEntry = ({ files = allFiles, ...configOptions }) => (
-  {
-    files,
-    languageOptions : {
+const getEslintConfigEntry = ({ files = allFiles, ...configOptions }) => ({
+  files,
+  languageOptions : {
+    sourceType,
+    parser        : babelParser,
+    parserOptions : {
+      // yes, sourceType appears at both the languageOptions and parserOptinos level
       sourceType,
-      parser        : babelParser,
-      parserOptions : {
-        // yes, sourceType appears at both the languageOptions and parserOptinos level
-        sourceType,
-        requireConfigFile : true,
-        babelOptions      : { configFile : babelConfigPath },
-        ecmaFeatures      : { jsx : true },
-      },
-      ecmaVersion : 'latest',
+      requireConfigFile : true,
+      babelOptions      : { configFile : babelConfigPath },
+      ecmaFeatures      : { jsx : true },
     },
-    settings : { react : reactSettings },
-    ...configOptions
-  }
-)
+    ecmaVersion : 'latest',
+  },
+  settings : { react : reactSettings },
+  ...configOptions,
+})
 
 export { getEslintConfigEntry }

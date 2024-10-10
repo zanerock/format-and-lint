@@ -20,8 +20,8 @@ import { prettierConfig as defaultPrettierConfig } from './default-config/pretti
  * @param {object} [options.eslintConfig = <default eslint config>] - A flat (9.x) style array of [eslint configuration
  *   object](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects) to be used in
  *   place of the default, out of the box configuration. This may not be specified along with `ruleSets`.
- * @param {object} [options.ruleSets = undefined] - An object with zero or more keys whose values are a valid ESlint 
- *   "flat" configuration. Keys corresponding to the [standard fandl rule sets](#rule-sets) will override the named 
+ * @param {object} [options.ruleSets = undefined] - An object with zero or more keys whose values are a valid ESlint
+ *   "flat" configuration. Keys corresponding to the [standard fandl rule sets](#rule-sets) will override the named
  *   rule set. Any additional rule will be appended to the configuration array.
  * @param {object} [options.prettierConfig = <default prettier config>] - A prettier [options
  *   object](https://prettier.io/docs/en/options).
@@ -89,7 +89,7 @@ const processSource = async (
     outputDir,
     prettierConfig,
     relativeStem = process.cwd(),
-  }
+  },
 ) => {
   const readPromise = readFile(file, { encoding : 'utf8' })
   const inputSource = await readPromise
@@ -100,7 +100,7 @@ const processSource = async (
   const lintResults = await eslint.lintText(
     // we must specify the file path in order for the proper rules from the flat config to attach
     prettierSource,
-    { filePath : file }
+    { filePath : file },
   )
 
   // the output is undefined if there are no changes due to the linting, but there may be changes due to prettier, so

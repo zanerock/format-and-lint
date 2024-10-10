@@ -31,9 +31,9 @@ describe('eslint-config.mjs', () => {
     })
 
     const results = await eslint.lintFiles(
-      `src/lib/default-config/test/data/${testDir}/**/*`
+      `src/lib/default-config/test/data/${testDir}/**/*`,
     )
-    
+
     expect(results).toHaveLength(1)
     // do this first so we get info about the failed rules
     const failedRules = results[0].messages.map((m) => m.ruleId)

@@ -81,15 +81,12 @@ const extractFormatOrLintOptions = (command, mainOpts) =>
       mainOpts,
       commandLineArgs(
         cliSpec.commands.find((c) => c.name === command).arguments,
-        { argv : mainOpts._unknown, camelCase : true }
-      )
+        { argv : mainOpts._unknown, camelCase : true },
+      ),
     )
 
 const verifyArgs = ({ eslintConfigPath, ruleSetsPath }) => {
-  if (
-    eslintConfigPath !== undefined
-    && ruleSetsPath !== undefined
-  ) {
+  if (eslintConfigPath !== undefined && ruleSetsPath !== undefined) {
     throw new ArgumentInvalidError({
       message :
         "Specifying both '--eslint-config-path' and '--rule-sets-path' is invalid. Please specify one or the other.",

@@ -17,7 +17,7 @@ describe('fandl', () => {
       'lib',
       'test',
       'data',
-      'boolean-ops'
+      'boolean-ops',
     )
     let tmpDir
 
@@ -42,7 +42,7 @@ describe('fandl', () => {
         encoding : 'utf8',
       })
       const formattedExampleConents = await getFormattedTextFor(
-        join(testDirSrc, 'index.mjs')
+        join(testDirSrc, 'index.mjs'),
       )
 
       expect(formattedFileContents).toBe(formattedExampleConents)
@@ -58,12 +58,7 @@ describe('fandl', () => {
   test("raises error if both '--eslint-config-path' and '--rule-sets-path' are specified", async () => {
     try {
       await fandl({
-        argv : [
-          '--eslint-config-path',
-          '/foo',
-          '--rule-sets-path',
-          '/foo',
-        ],
+        argv : ['--eslint-config-path', '/foo', '--rule-sets-path', '/foo'],
       })
       throw new Error('Did not throw error as expected.')
     }

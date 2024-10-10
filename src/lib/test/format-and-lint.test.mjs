@@ -14,10 +14,10 @@ const __dirname = myDirFromImport(import.meta.url)
 describe('formatAndLint', () => {
   test("raises error if 'eslintConfig' and 'ruleSets' defined", async () => {
     const args = {
-      check                  : true,
-      eslintConfig           : [],
-      ruleSets : [],
-      files                  : ['foo.js'],
+      check        : true,
+      eslintConfig : [],
+      ruleSets     : [],
+      files        : ['foo.js'],
     }
     try {
       // expect(() => formatAndLint(args)).toThrow(/You cannot define/)
@@ -64,7 +64,7 @@ describe('formatAndLint', () => {
         encoding : 'utf8',
       })
       const formattedExampleConents = await getFormattedTextFor(
-        join(testDirSrc, 'index.mjs')
+        join(testDirSrc, 'index.mjs'),
       )
 
       expect(formattedFileContents).toBe(formattedExampleConents)

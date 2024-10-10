@@ -16,7 +16,7 @@ import promisePlugin from 'eslint-plugin-promise'
 import nPlugin from 'eslint-plugin-n'
 import { fixupPluginRules } from '@eslint/compat'
 import js from '@eslint/js'
-import stylistic from '@stylistic/eslint-plugin'
+import stylisticPlugin from '@stylistic/eslint-plugin'
 import standardPlugin from 'eslint-config-standard'
 
 import { getEslintConfigEntry } from './lib/get-eslint-config-entry'
@@ -24,48 +24,46 @@ import { linebreakTypesExcept } from './lib/linebreak-types-except'
 import { allExts, allExtsStr, jsxExtsStr } from './lib/js-extensions'
 import { engines, reactSettings } from './lib/package-settings'
 
-const stylisticConfig = stylistic.configs['recommended-flat']
+const stylisticConfig = stylisticPlugin.configs['recommended-flat']
 
-const plugins = Object.assign(
-  {
-    // the 'standard' rules plugins
-    standard : standardPlugin,
-    import   : importPlugin,
-    promise  : promisePlugin,
-    n        : nPlugin,
-  }
-)
+const plugins = Object.assign({
+  // the 'standard' rules plugins
+  standard : standardPlugin,
+  import   : importPlugin,
+  promise  : promisePlugin,
+  n        : nPlugin,
+})
 
 const rules = {
-  'import/export'                   : 'off',
+  'import/export'         : 'off',
   // the standard 'no-unused-vars ignores unused args, which we'd rather catch. We also want to exclude 'React',
   // which we need to import for react to work, even when not used
-  'no-unused-vars'                  : ['error', { varsIgnorePattern : 'React' }],
+  'no-unused-vars'        : ['error', { varsIgnorePattern : 'React' }],
   // style/consistency rules
   // this modifies JS Standard style
-  'prefer-regex-literals'           : 'error',
-  'yoda'                            : ['error', 'never'],
+  'prefer-regex-literals' : 'error',
+  'yoda'                  : ['error', 'never'],
   // use 'process.stdout'/'process.stderr' when you really want to communicate to the user
-  'no-console'                      : 'error',
+  'no-console'            : 'error',
   // efficiency rules
-  'no-await-in-loop'                : 'error',
+  'no-await-in-loop'      : 'error',
   // rules for odd code/possible red flags/unintentional logic
-  'no-lonely-if'                    : 'error',
-  'no-return-assign'                : 'error',
-  'no-shadow'                       : 'error',
-  'no-extra-label'                  : 'error',
-  'no-label-var'                    : 'error',
-  'no-invalid-this'                 : 'error',
-  'no-unreachable-loop'             : 'error',
-  'no-extra-bind'                   : 'error',
-  'require-await'                   : 'error',
-  'consistent-return'               : 'error',
-  'default-case-last'               : 'error',
-  'eqeqeq'                          : 'error',
+  'no-lonely-if'          : 'error',
+  'no-return-assign'      : 'error',
+  'no-shadow'             : 'error',
+  'no-extra-label'        : 'error',
+  'no-label-var'          : 'error',
+  'no-invalid-this'       : 'error',
+  'no-unreachable-loop'   : 'error',
+  'no-extra-bind'         : 'error',
+  'require-await'         : 'error',
+  'consistent-return'     : 'error',
+  'default-case-last'     : 'error',
+  'eqeqeq'                : 'error',
   // limit code complexity
-  'complexity'                      : ['error', 20], // default val
-  'max-depth'                       : ['error', 4], // default val
-  'max-lines'                       : [
+  'complexity'            : ['error', 20], // default val
+  'max-depth'             : ['error', 4], // default val
+  'max-lines'             : [
     'error',
     { max : 300, skipBlankLines : true, skipComments : true },
   ], // default val,
@@ -77,14 +75,15 @@ const rules = {
 
 const allFiles = [`**/*{${allExtsStr}}`]
 
-const defaultBaseRecommended = 
-  getEslintConfigEntry({ rules : js.configs.recommended.rules })
+const defaultBaseRecommended = getEslintConfigEntry({
+  rules : js.configs.recommended.rules,
+})
 
 const stylisticRules = {
   ...stylisticConfig.rules, // the stylistic rules also cover react rules
-  // this is actually the default in the code, but the docs say '1tbs' is the default, so we define it here for future 
+  // this is actually the default in the code, but the docs say '1tbs' is the default, so we define it here for future
   // safety
-  '@stylistic/brace-style' : ['error', 'stroustrup', { allowSingleLine: true }],
+  '@stylistic/brace-style' : ['error', 'stroustrup', { allowSingleLine : true }],
   // override key spacing to get things aligned
   '@stylistic/key-spacing' : [
     'error',
@@ -97,10 +96,10 @@ const stylisticRules = {
     { allowTemplateLiterals : true, avoidEscape : true },
   ],
   // additional rules
-  '@stylistic/arrow-parens'          : ['error', 'always'], // I like this to be consistent
-  '@stylistic/array-bracket-newline' : ['error', 'consistent'],
-  '@stylistic/array-element-newline' : ['error', 'consistent'],
-  '@stylistic/comma-dangle'          : ['error', 'always-multiline'],
+  '@stylistic/arrow-parens'                   : ['error', 'always'], // I like this to be consistent
+  '@stylistic/array-bracket-newline'          : ['error', 'consistent'],
+  '@stylistic/array-element-newline'          : ['error', 'consistent'],
+  '@stylistic/comma-dangle'                   : ['error', 'always-multiline'],
   '@stylistic/function-call-argument-newline' : ['error', 'consistent'],
   '@stylistic/function-call-spacing'          : ['error', 'never'],
   '@stylistic/function-paren-newline'         : ['error', 'consistent'],
@@ -168,7 +167,7 @@ const stylisticRules = {
         'singleline-const',
         'singleline-let',
         'singleline-var',
-        'var'
+        'var',
       ),
     },
     { blankLine : 'always', prev : '*', next : 'return' },
@@ -190,12 +189,12 @@ const stylisticRules = {
 delete stylisticRules['@stylistic/indent-binary-ops']
 
 const defaultStylistic = getEslintConfigEntry({
-  plugins: stylisticConfig.plugins, // names plugin '@stylistic'
-  rules: stylisticRules,
+  plugins : stylisticConfig.plugins, // names plugin '@stylistic'
+  rules   : stylisticRules,
 })
 
 const standardRules = standardPlugin.rules
-// The standard rules have some overlap with the stylistic rules. We remove them to avoid conflict and double 
+// The standard rules have some overlap with the stylistic rules. We remove them to avoid conflict and double
 // reporting. We prefer stylistic because it's supported directly be ESLint.
 delete standardRules['block-spacing'] // redundant with stylistic
 delete standardRules['brace-style'] // they say '1tbs', we say 'stroustrup'
@@ -248,7 +247,7 @@ const defaultJsxConfig = {
   files           : [`**/*{${jsxExtsStr}}`],
   // add necessary globals when processing JSX files
   languageOptions : { globals : globalsPkg.browser },
-  settings : { react : reactSettings },
+  settings        : { react : reactSettings },
 }
 
 const defaultTestsConfig = {
@@ -261,23 +260,28 @@ const defaultTestsConfig = {
   },
 }
 
-const getEslintConfig = ({
-  disable = [],
-  ruleSets = {},
-} = {}) => {
+const getEslintConfig = ({ disable = [], ruleSets = {} } = {}) => {
   const {
-    'base-recommended': baseRecommended = disable.includes('base-recommended') 
-      ? {} 
+    'base-recommended': baseRecommended = disable.includes('base-recommended')
+      ? {}
       : defaultBaseRecommended,
     stylistic = disable.includes('stylistic') ? {} : defaultStylistic,
-    additional = {}, 
-    base = defaultBaseConfig, 
-    jsdoc = defaultJsdocConfig, 
-    jsx = defaultJsxConfig, 
+    additional = {},
+    base = defaultBaseConfig,
+    jsdoc = defaultJsdocConfig,
+    jsx = defaultJsxConfig,
     test = defaultTestsConfig,
   } = ruleSets
 
-  const eslintConfig = [baseRecommended, stylistic, base, jsdoc, jsx, test, additional]
+  const eslintConfig = [
+    baseRecommended,
+    stylistic,
+    base,
+    jsdoc,
+    jsx,
+    test,
+    additional,
+  ]
 
   return eslintConfig
 }

@@ -37,7 +37,7 @@ describe('selectFilesFromOptions', () => {
     for (let i = 0; i < selectedFiles.length; i += 1) {
       if (selectedFiles[i].endsWith(expectedFiles[i]) !== true) {
         throw new Error(
-          `Expected to match '${expectedFiles[i]}', but got '${selectedFiles[i]}' (position ${i}).`
+          `Expected to match '${expectedFiles[i]}', but got '${selectedFiles[i]}' (position ${i}).`,
         )
       }
     }

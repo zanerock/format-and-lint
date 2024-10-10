@@ -41,7 +41,7 @@ const selectFilesFromOptions = async ({
 
   const ignorePatterns = await processFilePatterns(
     ignoreFiles,
-    ignoreFilesPaths
+    ignoreFilesPaths,
   )
   if (noStandardIgnores !== true) {
     ignorePatterns.push(...standardIgnores)

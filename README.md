@@ -71,7 +71,7 @@ Parses, lints, and (when `check` is false) reformats the `files` text. By defaul
 | [`options.check`] | `boolean` | `false` | If `true` then the files are linted, but not reformatted. |
 | [`options.noWrite`] | `boolean` | `false` | If `true`, then the files are not updated in placed. Has no effect when   `check = false`, but when combined with `check = true`, means that the text is reformatted and attached to the   `LintResult`s, but the files themselves are not updated. You can access reformatted text as part of the   `result.lintResults[0].output`. Unlike results directly from `ESLint`, `output` is   always present on the `LintResult` object (rather than only being set if the text is changed. |
 | [`options.eslintConfig`] | `object` | `<default eslint config>` | A flat (9.x) style array of [eslint configuration   object](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-objects) to be used in   place of the default, out of the box configuration. This may not be specified along with `ruleSets`. |
-| [`options.ruleSets`] | `object` |  | An object with zero or more keys whose values are a valid ESlint    "flat" configuration. Keys corresponding to the [standard fandl rule sets](#rule-sets) will override the named    rule set. Any additional rule will be appended to the configuration array. |
+| [`options.ruleSets`] | `object` |  | An object with zero or more keys whose values are a valid ESlint   "flat" configuration. Keys corresponding to the [standard fandl rule sets](#rule-sets) will override the named   rule set. Any additional rule will be appended to the configuration array. |
 | [`options.prettierConfig`] | `object` | `<default prettier config>` | A prettier [options   object](https://prettier.io/docs/en/options). |
 | [`options.eslint`] | `object` |  | A pre-configured   [`ESLint`](https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class) instance. If this is defined, then   `eslintConfig` and `ruleSets` will be ignored. |
 | [`options.outputDir`] | `string` |  | If provided, then output files (whether reformatted or not) will be   written to the specified directory relative to their location in the source. With `src/index.mjs` =>   `<outputDir>/src/index.mjs`, `src/foo/bar.mjs` => `<outputDir>/src/foo/bar.mjs`. This option has no effect if   `check = true` or `noWrite = true`. The relative starting point is controlled with the `relativeStem` option. |
@@ -82,18 +82,20 @@ to the an instance of [`ESLint`](https://eslint.org/docs/latest/integrate/nodejs
 points to an array of [`LintResult`](https://eslint.org/docs/latest/integrate/nodejs-api#-lintresult-type)s.
 
 <a id="getEslintConfigEntry"></a>
-### `getEslintConfigEntry(options)` <sup>↱<sup>[source code](./src/lib/default-config/lib/get-eslint-config-entry.mjs#L37)</sup></sup> <sup>⇧<sup>[global index](#global-function-index)</sup></sup>
+### `getEslintConfigEntry(options)` ⇒ `object` <sup>↱<sup>[source code](./src/lib/default-config/lib/get-eslint-config-entry.mjs#L38)</sup></sup> <sup>⇧<sup>[global index](#global-function-index)</sup></sup>
 
-Generates an ESlint flat style configuration entry using the fandl parser defaults and supplied settings. This will 
-set default 'files' (unless overridden), 'languageOptions', and 'settings'. The most common usage is to add a set of 
+Generates an ESlint flat style configuration entry using the fandl parser defaults and supplied settings. This will
+set default 'files' (unless overridden), 'languageOptions', and 'settings'. The most common usage is to add a set of
 'rules' (and any necessary 'plugins'). File targets can be specified with 'files' and 'ignores'.
 
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `Object` |  | The input options. |
-| [`options.files`] | `Array.<string>` | `<all js/x files>` | An array of file patterns to match for this configuration.    Will default to match all '.js', '.cjs', '.mjs', and '.jsx'. |
-| `(...Object}` |  |  | options.configOptions - Additional options to apply to the configuration. The most common entries    will be 'ignores', rules', and 'plugin'. |
+| `options` | `object` |  | The input options. |
+| [`options.files`] | `Array.<string>` | `<all js/x files>` | An array of file patterns to match for this configuration.   Will default to match all '.js', '.cjs', '.mjs', and '.jsx'. |
+| ...`options.configOptions` | `object` |  | Additional options to apply to the configuration. The most common entries   will be 'ignores', rules', and 'plugin'. |
+
+**Returns**: `object` - A ESLint flat configuration entry.
 
 <a id="linebreakTypesExcept"></a>
 ### `linebreakTypesExcept(...types)` ⇒ `Array.<string>` <sup>↱<sup>[source code](./src/lib/default-config/lib/linebreak-types-except.mjs#L67)</sup></sup> <sup>⇧<sup>[global index](#global-function-index)</sup></sup>
@@ -154,7 +156,7 @@ By default, fandl assumes that the input source files use ES6 module format. You
 
 ## Formatting overview
 
-The code is run through prettier first mainly because it does a much better job properly indenting code and fitting it within a target width (80 chars).[^1] The partially reformatted code is then reformatted by eslint because prettier (purposely) has very few options and we don't agree with all of them. The eslint rules have been harmonized such that the final formatted code will pass a lint check.
+The code is run through prettier first mainly because it does a much better job properly indenting code and fitting it within a target width (80 chars).[^1] The partially reformatted code is then formatted by eslint because prettier (purposely) has very few options and we don't agree with all of them. The eslint rules have been harmonized such that the final formatted code will pass a lint check.
 
 Our formatting differs from prettier and/or JS standard on the following points:
 - fandl places operators at the beginning of the next line rather than the end of the previous line in multi-line expressions (contrary to prettier); this improves readability; e.g.:
@@ -192,7 +194,7 @@ Our formatting differs from prettier and/or JS standard on the following points:
     longFieldName : 'how are you?'
   }
   ```
-- fandl requires a dangling comma in multi-line array and object definitions as well as multi-line import and export statements[^2], which makes it slightly easier and less error prone when adding new items (contrary to JS Standard and prettier); e.g.:
+- fandl requires a dangling comma in multi-line array and object definitions as well as multi-line import and export statements[^2]; this makes diffs cleaner and it's easier/less error prone when making changes (contrary to JS Standard and prettier); e.g.:
   ```js
   // everyone agrees, no comma in single line
   const foo = [ 'item one', 'item 2' ]
@@ -205,6 +207,14 @@ Our formatting differs from prettier and/or JS standard on the following points:
     'item one',
     'item two'
   ]
+  ```
+- fandl requires operators come at the start of a newline in multi-line expressions (aka, 'before' style) ; this is easier to read and is consistent with the ternary operator formatting which we all agree is 'before'; e.g.:
+  ```js
+  const foo = bar //fandl style
+    & baz
+  // vs
+  const bar = bing & // JS Standard, prettier style
+    bong
   ```
 
 [^1]: I perhaps falsely remember eslint actually doing a better re indenting code, but in any case there are two issue with the latest eslint based reformatting. First, it miscounts the correct indention level where '('s were involved in boolean expressions. Second, eslint failed automatically break up long lines. (As of @stylistic/eslint-plugin: 2.6.4, eslint: 8.50.0; have since upgraded but not retested since it's working as is.)
