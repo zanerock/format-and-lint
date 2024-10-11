@@ -11,8 +11,8 @@
 import globalsPkg from 'globals'
 import importPlugin from 'eslint-plugin-import'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
-import nodePlugin from 'eslint-plugin-node'
 import promisePlugin from 'eslint-plugin-promise'
+import nodePlugin from 'eslint-plugin-node'
 import nPlugin from 'eslint-plugin-n'
 import { fixupPluginRules } from '@eslint/compat'
 import js from '@eslint/js'
@@ -29,7 +29,6 @@ const stylisticConfig = stylisticPlugin.configs['recommended-flat']
 const plugins = Object.assign({
   import   : importPlugin,
   promise  : promisePlugin,
-  n        : nPlugin,
 })
 
 const rules = {
@@ -226,19 +225,32 @@ const defaultBaseConfig = getEslintConfigEntry({ plugins, rules })
 let defaultNode = {}
 if (engines?.node !== undefined) {
   const nodeRules = {
-    ...nodePlugin.configs.recommended.rules,
-    'node/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
-    'node/prefer-promises/dns'               : 'error',
-    'node/prefer-promises/fs'                : 'error',
-    'node/no-missing-import'                 : [
+    ...nPlugin.configs['flat/recommended'].rules,
+    'n/file-extension-in-import'          : ['error', 'never'],
+    'n/no-unsupported-features/es-syntax' : 'off', // we expect teh code to run through Babel, so it's fine
+    'n/prefer-promises/dns'               : 'error',
+    'n/prefer-promises/fs'                : 'error',
+    // the 'n/no-missing-import(/require) versions do not support 'tryExtensions', which we need, especially since we 
+    // explicitly disallow file extensions; it's actually a bit baffling that that n would be so inconsistent
+    'node/no-missing-import'              : [
+      'error',
+      {
+        tryExtensions : allExts,
+      },
+    ],
+    'node/no-missing-require'             : [
       'error',
       {
         tryExtensions : allExts,
       },
     ]
   }
+
+  delete nodeRules['n/no-missing-import']
+  delete nodeRules['n/no-missing-require']
+
   defaultNode = getEslintConfigEntry({ 
-    plugins : { node : fixupPluginRules(nodePlugin) },
+    plugins : { n : nPlugin, node : fixupPluginRules(nodePlugin) },
     rules   : nodeRules
   })
   Object.assign(defaultNode.languageOptions.globals, globalsPkg.node)
